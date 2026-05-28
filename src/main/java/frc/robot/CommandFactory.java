@@ -3,21 +3,51 @@ package frc.robot;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.util.List;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.Limelight;
+import frc.robot.utility.RobotLocalization;
+import frc.robot.utility.TargetManager;
 
 public class CommandFactory {
 
-    private final CommandSwerveDrivetrain swerve;;
+    private final TargetManager targetManager;
+    private final CommandSwerveDrivetrain swerve;
+    private final RobotLocalization robotLocalization;
+    private final LED systemLights;
 
     public CommandFactory(
-            CommandSwerveDrivetrain swerve) {
+            CommandSwerveDrivetrain swerve,
+            List<Limelight> limelights,
+            LED systemLights) {
         this.swerve = swerve;
+        this.systemLights = systemLights;
+        this.targetManager = new TargetManager();
+        this.robotLocalization = new RobotLocalization(limelights, swerve);
+    }
+
+    /*
+     * Drive
+     */
+
+    public void updateTargetState() {
+        targetManager.updateTargetState(
+                robotLocalization.getActiveZones(),
+                DriverStation.getAlliance().orElse(Alliance.Blue),
+                swerve.getState(),
+                swerve.getOperatorForwardDirection());
+        SmartDashboard.putString("Targeting State", targetManager.getTargetingState().toString());
     }
 
     private Command driveTest(double targetVelocityX, double targetVelocityY, double duration, int steps) {
