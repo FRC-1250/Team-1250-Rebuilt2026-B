@@ -6,8 +6,11 @@ package frc.robot;
 
 import java.util.List;
 
+import com.ctre.phoenix6.signals.RGBWColor;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LED;
@@ -20,8 +23,8 @@ public class RobotContainer {
     private final CommandSwerveDrivetrain swerve = TunerConstants.createDrivetrain();
     private final Limelight limelight = new Limelight("limelight", LimelightLocalizationMode.ENABLED);
     private final Limelight limelightRear = new Limelight("limelight-rear", LimelightLocalizationMode.DISABED);
-    private LED systemLights;
-
+    private final LED systemLights = new LED();
+    private final CommandXboxController LightButtons = new CommandXboxController(0);
     public final CommandFactory commandFactory = new CommandFactory(
             swerve,
             List.of(limelight, limelightRear),
@@ -29,6 +32,11 @@ public class RobotContainer {
 
     public RobotContainer() {
         configureBindings();
+        LightButtons.a().onTrue(commandFactory.cmdColorControl(LED.kGreen));
+        LightButtons.b().onTrue(commandFactory.cmdColorControl(LED.kRed));
+        LightButtons.x().onTrue(commandFactory.cmdColorControl(LED.kBlue));
+        LightButtons.y().onTrue(commandFactory.cmdColorControl(LED.kYellow));
+        LightButtons.rightTrigger().onTrue(commandFactory.cmdAnimationControl());
     }
 
     private void configureBindings() {

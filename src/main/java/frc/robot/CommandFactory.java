@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.List;
 
+import com.ctre.phoenix6.controls.RainbowAnimation;
+import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -179,6 +181,14 @@ public class CommandFactory {
                 rotateTest(-targetTestRotationRate, rotateTestDuration, rotateTestSteps),
                 pointWheelsTest(targetTestVelocity, pointWheelsTestDuration, pointWheelsTestSteps, false),
                 pointWheelsTest(targetTestVelocity, pointWheelsTestDuration, pointWheelsTestSteps, true));
+    }
+
+    public Command cmdColorControl(RGBWColor newColor) {
+        return Commands.run(() -> systemLights.ColorControl(newColor, 0, 8), systemLights);
+    }
+
+    public Command cmdAnimationControl() {
+        return Commands.run(() -> systemLights.AnimationControl(), systemLights);
     }
 
     public Command proveOut() {
