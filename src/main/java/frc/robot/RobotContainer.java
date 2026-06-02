@@ -32,11 +32,11 @@ public class RobotContainer {
 
     public RobotContainer() {
         configureBindings();
-        LightButtons.a().onTrue(commandFactory.cmdColorControl(LED.kGreen));
-        LightButtons.b().onTrue(commandFactory.cmdColorControl(LED.kRed));
-        LightButtons.x().onTrue(commandFactory.cmdColorControl(LED.kBlue));
-        LightButtons.y().onTrue(commandFactory.cmdColorControl(LED.kYellow));
-        LightButtons.rightTrigger().onTrue(commandFactory.cmdAnimationControl());
+        LightButtons.a().whileTrue(commandFactory.cmdColorControl(LED.kGreen));
+        LightButtons.b().whileTrue(commandFactory.cmdColorControl(LED.kRed));
+        LightButtons.x().whileTrue(commandFactory.cmdColorControl(LED.kBlue));
+        LightButtons.y().whileTrue(commandFactory.cmdColorControl(LED.kYellow));
+        LightButtons.rightTrigger().whileTrue(commandFactory.cmdAnimationControl());
     }
 
     private void configureBindings() {
