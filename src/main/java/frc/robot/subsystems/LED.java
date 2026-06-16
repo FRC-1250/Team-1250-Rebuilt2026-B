@@ -30,7 +30,7 @@ public class LED extends SubsystemBase {
     public LED() {
         CANdleConfiguration candleConfiguration = new CANdleConfiguration();
         candleConfiguration.LED.BrightnessScalar = 0.6;
-        candleConfiguration.LED.StripType = StripTypeValue.RGB;
+        candleConfiguration.LED.StripType = StripTypeValue.GRB;
         candleConfiguration.LED.LossOfSignalBehavior = LossOfSignalBehaviorValue.DisableLEDs;
 
         candleConfiguration.CANdleFeatures.StatusLedWhenActive = StatusLedWhenActiveValue.Disabled;
@@ -44,11 +44,11 @@ public class LED extends SubsystemBase {
     }
 
     public void ColorControl(RGBWColor newColor) {
-        ColorControl(newColor, 0, 8);
+        ColorControl(newColor, 0, 357);
     }
 
     public void AnimationControl() {
-        m_candle.setControl(new RainbowAnimation(0, 8));
+        m_candle.setControl(new RainbowAnimation(0, 357));
     }
 
     @Override
