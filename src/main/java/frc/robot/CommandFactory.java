@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.List;
 
-import com.ctre.phoenix6.controls.RainbowAnimation;
 import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -16,11 +15,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Limelight;
-import frc.robot.utility.HubTracker;
 import frc.robot.utility.RobotLocalization;
 import frc.robot.utility.TargetManager;
 
@@ -40,15 +37,6 @@ public class CommandFactory {
         this.targetManager = new TargetManager();
         this.robotLocalization = new RobotLocalization(limelights, swerve);
     }
-
-    Trigger Inactive = new Trigger(
-            () -> HubTracker.timeRemainingInCurrentShift().get().baseUnitMagnitude() <= 7 && !HubTracker.isActive());
-
-    Trigger Active = new Trigger(
-            () -> HubTracker.timeRemainingInCurrentShift().get().baseUnitMagnitude() <= 7 && HubTracker.isActive());
-
-    Trigger InactiveWithoutTime = new Trigger(
-            () -> !HubTracker.isActive());
 
     /*
      * Drive

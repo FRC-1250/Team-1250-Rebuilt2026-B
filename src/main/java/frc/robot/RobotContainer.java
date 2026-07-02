@@ -16,6 +16,8 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Limelight.LimelightLocalizationMode;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.utility.HubTracker;
 
 public class RobotContainer {
 
@@ -29,6 +31,43 @@ public class RobotContainer {
             swerve,
             List.of(limelight, limelightRear),
             systemLights);
+
+    private final double SHIFT_CLOCK_WARNING = 8.0;
+    private final double SHIFT_CLOCK_PRE_FIRE = 2.0;
+
+    private final Trigger hubInactive = new Trigger(
+            () -> {
+                var timeOpt = HubTracker.timeRemainingInCurrentShift();
+                if (timeOpt.isPresent()) {
+                    return timeOpt.get().baseUnitMagnitude() > SHIFT_CLOCK_WARNING
+                            && !HubTracker.isActive();
+                }
+                return false;
+            });
+
+    private final Trigger hubActiveSoon = new Trigger(
+            () -> {
+                var timeOpt = HubTracker.timeRemainingInCurrentShift();
+                if (timeOpt.isPresent()) {
+                    var time = timeOpt.get().baseUnitMagnitude();
+                    return time <= SHIFT_CLOCK_WARNING && time > SHIFT_CLOCK_PRE_FIRE
+                            && !HubTracker.isActive();
+                }
+                return false;
+            });
+
+    private final Trigger hubActivePreFire = new Trigger(
+            () -> {
+                var timeOpt = HubTracker.timeRemainingInCurrentShift();
+                if (timeOpt.isPresent()) {
+                    return timeOpt.get().baseUnitMagnitude() <= SHIFT_CLOCK_PRE_FIRE
+                            && !HubTracker.isActive();
+                }
+                return false;
+            });
+
+    private final Trigger hubActive = new Trigger(
+            () -> !HubTracker.isActive());
 
     public RobotContainer() {
         configureBindings();
