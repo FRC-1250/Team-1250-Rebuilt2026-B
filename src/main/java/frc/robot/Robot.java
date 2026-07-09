@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.Optional;
 
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,15 +26,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
+        m_robotContainer.processShiftClock();
+        m_robotContainer.getTimeLeftInShift();
+
+        SmartDashboard.putNumber("Shift Time", m_robotContainer.getTimeLeftInShift());
+        SmartDashboard.putString("Shift", m_robotContainer.getShift().toString());
+        SmartDashboard.putNumber("Match time", DriverStation.getMatchTime());
+
         CommandScheduler.getInstance().run();
-        Optional<Time> t = HubTracker.timeRemainingInCurrentShift();
-        if (t.isPresent()) {
-            SmartDashboard.putNumber("Shift Time", t.get().baseUnitMagnitude());
-        }
-        Optional<Shift> s = HubTracker.getCurrentShift();
-        if (s.isPresent()) {
-            SmartDashboard.putString("Shift", s.get().toString());
-        }
     }
 
     @Override

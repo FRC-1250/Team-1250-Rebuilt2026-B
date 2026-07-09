@@ -5,9 +5,9 @@
 package frc.robot;
 
 import java.util.List;
+import java.util.Optional;
 
-import com.ctre.phoenix6.signals.RGBWColor;
-
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -18,6 +18,7 @@ import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Limelight.LimelightLocalizationMode;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.utility.HubTracker;
+import frc.robot.utility.HubTracker.Shift;
 
 public class RobotContainer {
 
@@ -34,37 +35,47 @@ public class RobotContainer {
 
     private final double SHIFT_CLOCK_WARNING = 8.0;
     private final double SHIFT_CLOCK_PRE_FIRE = 2.0;
+    private double timeLeftInShift = 0;
+    private Shift shift = Shift.AUTO;
+    private Optional<Time> timeOpt;
+    private Optional<Shift> shiftOpt;
+
+    public Shift getShift() {
+        return shift;
+    }
+
+    public double getTimeLeftInShift() {
+        return timeLeftInShift;
+    }
+
+    public void processShiftClock() {
+        timeOpt = HubTracker.timeRemainingInCurrentShift();
+        if (timeOpt.isPresent()) {
+            timeLeftInShift = timeOpt.get().baseUnitMagnitude();
+        } else {
+            timeLeftInShift = Double.MAX_VALUE;
+        }
+
+        shiftOpt = HubTracker.getCurrentShift();
+        if (shiftOpt.isPresent()) {
+            shift = shiftOpt.get();
+        } else {
+            shift = Shift.AUTO;
+        }
+    }
 
     private final Trigger hubInactive = new Trigger(
-            () -> {
-                var timeOpt = HubTracker.timeRemainingInCurrentShift();
-                if (timeOpt.isPresent()) {
-                    return timeOpt.get().baseUnitMagnitude() > SHIFT_CLOCK_WARNING
-                            && !HubTracker.isActive();
-                }
-                return false;
-            });
+            () -> (timeLeftInShift > SHIFT_CLOCK_WARNING
+                    && !HubTracker.isActive()));
 
     private final Trigger hubActiveSoon = new Trigger(
-            () -> {
-                var timeOpt = HubTracker.timeRemainingInCurrentShift();
-                if (timeOpt.isPresent()) {
-                    var time = timeOpt.get().baseUnitMagnitude();
-                    return time <= SHIFT_CLOCK_WARNING && time > SHIFT_CLOCK_PRE_FIRE
-                            && !HubTracker.isActive();
-                }
-                return false;
-            });
+            () -> (timeLeftInShift <= SHIFT_CLOCK_WARNING
+                    && timeLeftInShift > SHIFT_CLOCK_PRE_FIRE
+                    && !HubTracker.isActive()));
 
     private final Trigger hubActivePreFire = new Trigger(
-            () -> {
-                var timeOpt = HubTracker.timeRemainingInCurrentShift();
-                if (timeOpt.isPresent()) {
-                    return timeOpt.get().baseUnitMagnitude() <= SHIFT_CLOCK_PRE_FIRE
-                            && !HubTracker.isActive();
-                }
-                return false;
-            });
+            () -> (timeLeftInShift <= SHIFT_CLOCK_PRE_FIRE
+                    && !HubTracker.isActive()));
 
     private final Trigger hubActive = new Trigger(
             () -> !HubTracker.isActive());
