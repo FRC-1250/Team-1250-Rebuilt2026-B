@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -87,6 +88,7 @@ public class RobotContainer {
         LightButtons.x().whileTrue(commandFactory.cmdColorControl(LED.kBlue));
         LightButtons.y().whileTrue(commandFactory.cmdColorControl(LED.kYellow));
         LightButtons.rightTrigger().whileTrue(commandFactory.cmdAnimationControl());
+        hubActiveSoon.onTrue(Commands.run(() -> LightButtons.setRumble(RumbleType.kBothRumble, 0.5)));
     }
 
     private void configureBindings() {
@@ -94,5 +96,8 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
-    }
+    }pulse=new
+
+    VibrationProfile
+    pulse.addStep(new VibrationStep(1,0.25));
 }
