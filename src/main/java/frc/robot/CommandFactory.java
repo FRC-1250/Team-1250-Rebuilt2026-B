@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.LED.Animation;
 import frc.robot.utility.RobotLocalization;
 import frc.robot.utility.TargetManager;
 
@@ -183,11 +184,11 @@ public class CommandFactory {
     }
 
     public Command cmdColorControl(RGBWColor newColor) {
-        return Commands.run(() -> systemLights.ColorControl(newColor, 0, 8), systemLights);
+        return Commands.run(() -> systemLights.setColor(newColor), systemLights);
     }
 
     public Command cmdAnimationControl() {
-        return Commands.run(() -> systemLights.AnimationControl(), systemLights);
+        return Commands.run(() -> systemLights.setAnimation(Animation.RAINBOW), systemLights);
     }
 
     public Command proveOut() {
