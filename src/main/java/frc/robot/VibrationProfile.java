@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
 public class VibrationProfile {
 
     private Timer timer;
-    private List<VibrationSteps> steps;
+    private List<VibrationStep> steps;
     private int index;
 
     public VibrationProfile() {
@@ -17,7 +17,7 @@ public class VibrationProfile {
         index = 0;
     }
 
-    public void addStep(VibrationSteps as) {
+    public void addStep(VibrationStep as) {
         if (as.getInterval() > 0)
             this.steps.add(as);
     }

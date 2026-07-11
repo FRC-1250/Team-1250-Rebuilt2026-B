@@ -79,25 +79,25 @@ public class RobotContainer {
                     && !HubTracker.isActive()));
 
     private final Trigger hubActive = new Trigger(
-            () -> !HubTracker.isActive());
+            () -> HubTracker.isActive());
 
     public RobotContainer() {
         configureBindings();
+    }
+
+    private void configureBindings() {
         LightButtons.a().whileTrue(commandFactory.cmdColorControl(LED.kGreen));
         LightButtons.b().whileTrue(commandFactory.cmdColorControl(LED.kRed));
         LightButtons.x().whileTrue(commandFactory.cmdColorControl(LED.kBlue));
         LightButtons.y().whileTrue(commandFactory.cmdColorControl(LED.kYellow));
         LightButtons.rightTrigger().whileTrue(commandFactory.cmdAnimationControl());
         hubActiveSoon.onTrue(Commands.run(() -> LightButtons.setRumble(RumbleType.kBothRumble, 0.5)));
-    }
 
-    private void configureBindings() {
+        VibrationProfile pulse = new VibrationProfile();
+        pulse.addStep(new VibrationStep(RumbleType.kBothRumble, 1.0, 0.25));
     }
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
-    }pulse=new
-
-    VibrationProfile
-    pulse.addStep(new VibrationStep(1,0.25));
+    }
 }
