@@ -4,17 +4,15 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+public class Loader extends SubsystemBase {
+    private TalonFX LoaderPlaceholder1 = new TalonFX(1);
+    private TalonFX LoaderPlaceholder2 = new TalonFX(3);
 
-public class Hopper extends SubsystemBase {
-    private TalonFX HopperPlaceholder1 = new TalonFX(30);
-    private DigitalInput HopperSensorPlaceholder = new DigitalInput(1);
-
-    /** Creates a new Hopper. */
-    public Hopper() {
+    /** Creates a new Loader. */
+    public Loader() {
     }
 
     @Override

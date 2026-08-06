@@ -5,13 +5,18 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 public class Indexer extends SubsystemBase {
-  /** Creates a new Indexer. */
-  public Indexer() {}
+    private TalonFX IndexerPlaceholder1 = new TalonFX(12);
+    private TalonFX IndexerPlaceholder2 = new TalonFX(13);
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+    /** Creates a new Indexer. */
+    public Indexer() {
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+    }
 }

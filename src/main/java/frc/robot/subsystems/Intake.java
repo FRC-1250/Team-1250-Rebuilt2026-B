@@ -5,13 +5,18 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 public class Intake extends SubsystemBase {
-  /** Creates a new Intake. */
-  public Intake() {}
+    private TalonFX IntakePlaceholder1 = new TalonFX(7);
+    private TalonFX IntakePlaceholder2 = new TalonFX(30);
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+    /** Creates a new Intake. */
+    public Intake() {
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+    }
 }
