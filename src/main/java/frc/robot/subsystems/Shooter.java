@@ -6,14 +6,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Frequency;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Hertz;
@@ -26,23 +21,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.ChassisReference;
-import com.ctre.phoenix6.sim.TalonFXSimState;
 
 public class Shooter extends SubsystemBase {
-
-    private TalonFX ShooterPlaceholder1 = new TalonFX(17); // Used as the leader motor placeholder
-    private TalonFX ShooterPlaceholder2 = new TalonFX(21);
-    private TalonFX ShooterPlaceholder3 = new TalonFX(2); // Used as the follower motor placeholder
-    private final Follower ShooterPlaceholder3Control = new Follower(ShooterPlaceholder1.getDeviceID(),
-            MotorAlignmentValue.Opposed);
-
-    private final double kGearRatio = 1.0;
-
-    private final DCMotorSim m_motorSimModel = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
-                    DCMotor.getFalcon500(1), 0.001, kGearRatio),
-            DCMotor.getFalcon500(1));
 
     public enum ShooterVelocity {
         UNJAM(-10),
@@ -54,21 +34,94 @@ public class Shooter extends SubsystemBase {
 
         public double rotationsPerSecond;
 
-        ShooterVelocity(double shooterRotationsPerSecond) {
+        ShooterVelocity(final double shooterRotationsPerSecond) {
             this.rotationsPerSecond = shooterRotationsPerSecond;
         }
     }
 
-    private final InterpolatingDoubleTreeMap shooterVelocityLUT = new InterpolatingDoubleTreeMap();
-    private final VelocityVoltage shooterVelocityControl = new VelocityVoltage(0).withSlot(0);
+    private final TalonFX left = new TalonFX(1);
+    private final TalonFX upperRight = new TalonFX(2);
+    private final TalonFX lowerRight = new TalonFX(3);
+    private final InterpolatingDoubleTreeMap velocityLookUpTable = new InterpolatingDoubleTreeMap();
+    private final Follower followerControl = new Follower(left.getDeviceID(), MotorAlignmentValue.Opposed);
+    private final VelocityVoltage velocityVoltageControl = new VelocityVoltage(0).withSlot(0);
 
     public Shooter() {
         configureShooter();
         configureVelocityMap();
+    }
 
-        if (Robot.isSimulation()) {
-            simulationInit();
-        }
+    public double getInterpolatedVelocity(final double distance) {
+        // get handles interpolation for you
+        return velocityLookUpTable.get(distance);
+    }
+
+    public double getTargetVelocity(final double distance) {
+        // (meters, rps)
+        // y = 15.36x (0,0) to (3.125, 48)
+        // y = 56x - 127 (3.125, 48) to (3.25, 55)
+        return Math.max(Math.min(15.36 * distance, ShooterVelocity.MAX.rotationsPerSecond),
+                ShooterVelocity.MIN.rotationsPerSecond);
+    }
+
+    public void setShooterVelocity(final double rotationsPerSecond) {
+        left.setControl(
+                velocityVoltageControl
+                        .withVelocity(rotationsPerSecond)
+                        .withFeedForward(Volts.of(0)));
+    }
+
+    public boolean isShooterNearRotationsPerSecond(final double rotationsPerSecond, final double tolerance) {
+        return left.getVelocity().isNear(rotationsPerSecond, tolerance);
+    }
+
+    public void stopShooter() {
+        left.stopMotor();
+    }
+
+    @Logged(name = "Left Velocity")
+    public double getLeftVelocity() {
+        return left.getVelocity().getValueAsDouble();
+    }
+
+    @Logged(name = "Left Stator Current")
+    public double getLeftStatorCurrent() {
+        return left.getStatorCurrent().getValueAsDouble();
+    }
+
+    @Logged(name = "Left Supply Current")
+    public double getLeftSupplyCurrent() {
+        return left.getSupplyCurrent().getValueAsDouble();
+    }
+
+    @Logged(name = "Upper Right Velocity")
+    public double getUpperRightVelocity() {
+        return upperRight.getVelocity().getValueAsDouble();
+    }
+
+    @Logged(name = "Upper Right Stator Current")
+    public double getUpperRightStatorCurrent() {
+        return upperRight.getStatorCurrent().getValueAsDouble();
+    }
+
+    @Logged(name = "Upper Right Supply Current")
+    public double getUpperRightSupplyCurrent() {
+        return upperRight.getSupplyCurrent().getValueAsDouble();
+    }
+
+    @Logged(name = "Lower Right Velocity")
+    public double getLowerRightVelocity() {
+        return lowerRight.getVelocity().getValueAsDouble();
+    }
+
+    @Logged(name = "Lower Right Stator Current")
+    public double getLowerRightStatorCurrent() {
+        return lowerRight.getStatorCurrent().getValueAsDouble();
+    }
+
+    @Logged(name = "Lower Right Supply Current")
+    public double getLowerRightSupplyCurrent() {
+        return lowerRight.getSupplyCurrent().getValueAsDouble();
     }
 
     private void configureVelocityMap() {
@@ -80,126 +133,44 @@ public class Shooter extends SubsystemBase {
          * missing distance.
          * 
          */
-        var hubFrontToCenterOffsetMeters = 0.591;
-        var robotFrontToCenterOffsetMeters = 0.724 / 2; // with bumpers
-        var offset = hubFrontToCenterOffsetMeters + robotFrontToCenterOffsetMeters;
+        final var hubFrontToCenterOffsetMeters = 0.591;
+        final var robotFrontToCenterOffsetMeters = 0.724 / 2; // with bumpers
+        final var offset = hubFrontToCenterOffsetMeters + robotFrontToCenterOffsetMeters;
 
-        shooterVelocityLUT.put(Units.feetToMeters(4) + offset, 40.0);
-        shooterVelocityLUT.put(Units.feetToMeters(6) + offset, 45.0);
-        shooterVelocityLUT.put(Units.feetToMeters(8) + offset, 48.0);
-        shooterVelocityLUT.put(Units.feetToMeters(10) + offset, 53.0);
-        shooterVelocityLUT.put(Units.feetToMeters(20) + offset, 70.0);
-    }
-
-    public double getInterpolatedVelocity(double distance) {
-        // get handles interpolation for you here
-        return shooterVelocityLUT.get(distance);
-    }
-
-    public void setShooterVelocity(double rotationsPerSecond) {
-        ShooterPlaceholder1.setControl(
-                shooterVelocityControl
-                        .withVelocity(rotationsPerSecond)
-                        .withFeedForward(Volts.of(0)));
-    }
-
-    public boolean isShooterNearRotationsPerSecond(double rotationsPerSecond, double tolerance) {
-        return ShooterPlaceholder1.getVelocity().isNear(rotationsPerSecond, tolerance);
-    }
-
-    public void simulationInit() {
-        var talonFXSim = ShooterPlaceholder1.getSimState();
-        talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
-        talonFXSim.setMotorType(TalonFXSimState.MotorType.KrakenX60);
-    }
-
-    public void stopShooter() {
-        ShooterPlaceholder1.stopMotor();
-    }
-
-    @Logged(name = "Shooter velocity")
-    public double getShooterVelocity() {
-        return ShooterPlaceholder1.getVelocity().getValueAsDouble();
-    }
-
-    @Logged(name = "Shooter leader stator current")
-    public double getShooterLeaderStatorCurrent() {
-        return ShooterPlaceholder1.getStatorCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Shooter leader supply current")
-    public double getShooterLeaderSupplyCurrent() {
-        return ShooterPlaceholder1.getSupplyCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Shooter follower stator current")
-    public double getShooterFollowerStatorCurrent() {
-        return ShooterPlaceholder3.getStatorCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Shooter follower supply current")
-    public double getShooterFollowerSupplyCurrent() {
-        return ShooterPlaceholder3.getSupplyCurrent().getValueAsDouble();
-    }
-
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
-    }
-
-    public double getTargetVelocity(double distance) {
-        // (meters, rps)
-        // y = 15.36x (0,0) to (3.125, 48)
-        // y = 56x - 127 (3.125, 48) to (3.25, 55)
-        return Math.max(Math.min(15.36 * distance, ShooterVelocity.MAX.rotationsPerSecond),
-                ShooterVelocity.MIN.rotationsPerSecond);
-    }
-
-    @Override
-    public void simulationPeriodic() {
-        var talonFXSim = ShooterPlaceholder1.getSimState();
-
-        // set the supply voltage of the TalonFX
-        talonFXSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-
-        // get the motor voltage of the TalonFX
-        var motorVoltage = talonFXSim.getMotorVoltageMeasure();
-
-        // use the motor voltage to calculate new position and velocity
-        // using WPILib's DCMotorSim class for physics simulation
-        m_motorSimModel.setInputVoltage(motorVoltage.in(Volts));
-        m_motorSimModel.update(0.020); // assume 20 ms loop time
-
-        // apply the new rotor position and velocity to the TalonFX;
-        // note that this is rotor position/velocity (before gear ratio), but
-        // DCMotorSim returns mechanism position/velocity (after gear ratio)
-        talonFXSim.setRawRotorPosition(m_motorSimModel.getAngularPosition().times(kGearRatio));
-        talonFXSim.setRotorVelocity(m_motorSimModel.getAngularVelocity().times(kGearRatio));
+        velocityLookUpTable.put(Units.feetToMeters(4) + offset, 40.0);
+        velocityLookUpTable.put(Units.feetToMeters(6) + offset, 45.0);
+        velocityLookUpTable.put(Units.feetToMeters(8) + offset, 48.0);
+        velocityLookUpTable.put(Units.feetToMeters(10) + offset, 53.0);
+        velocityLookUpTable.put(Units.feetToMeters(20) + offset, 70.0);
     }
 
     private void configureShooter() {
-        MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
+        final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
         motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
         motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
 
-        Slot0Configs velocityGains = new Slot0Configs()
+        final Slot0Configs velocityGains = new Slot0Configs()
                 .withKS(0.09)
                 .withKV(0.11)
                 .withKP(0.25)
                 .withKI(0)
                 .withKD(0.01);
 
-        TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
+        final TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
         talonFXConfiguration.Slot0 = velocityGains;
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = 50;
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
 
-        ShooterPlaceholder1.getConfigurator().apply(talonFXConfiguration);
-        ShooterPlaceholder1.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        left.getConfigurator().apply(talonFXConfiguration);
+        left.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
 
-        ShooterPlaceholder3.getConfigurator().apply(talonFXConfiguration);
-        ShooterPlaceholder3.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        ShooterPlaceholder3.setControl(ShooterPlaceholder3Control);
+        lowerRight.getConfigurator().apply(talonFXConfiguration);
+        lowerRight.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        lowerRight.setControl(followerControl);
+
+        upperRight.getConfigurator().apply(talonFXConfiguration);
+        upperRight.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        upperRight.setControl(followerControl);
     }
 }

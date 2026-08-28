@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.util.Optional;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -18,6 +19,7 @@ import frc.robot.utility.HubTracker.Shift;
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
+    @Logged(name = "Robot")
     private final RobotContainer m_robotContainer;
 
     public Robot() {

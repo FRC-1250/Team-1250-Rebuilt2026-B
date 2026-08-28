@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.List;
 import java.util.Optional;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,6 +17,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Limelight.LimelightLocalizationMode;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.utility.HubTracker;
@@ -33,7 +35,8 @@ public class RobotContainer {
             swerve,
             List.of(limelight, limelightRear),
             systemLights);
-
+    @Logged(name = "Shooter")
+    private final Shooter shooter = new Shooter();
     private final double SHIFT_CLOCK_WARNING = 8.0;
     private final double SHIFT_CLOCK_PRE_FIRE = 2.0;
     private double timeLeftInShift = 0;
