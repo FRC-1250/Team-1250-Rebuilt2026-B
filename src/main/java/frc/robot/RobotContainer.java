@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
@@ -35,6 +36,9 @@ public class RobotContainer {
 
     @Logged(name = "Shooter")
     private final Shooter shooter = new Shooter();
+
+    @Logged(name = "Hood")
+    private final Hood hood = new Hood();
 
     @Logged(name = "Loader")
     private final Loader loader = new Loader();
