@@ -39,11 +39,11 @@ public class Shooter extends SubsystemBase {
         }
     }
 
-    private final TalonFX left = new TalonFX(1);
-    private final TalonFX upperRight = new TalonFX(2);
-    private final TalonFX lowerRight = new TalonFX(3);
+    private final TalonFX leftMotor = new TalonFX(1);
+    private final TalonFX upperRightMotor = new TalonFX(2);
+    private final TalonFX lowerRightMotor = new TalonFX(3);
     private final InterpolatingDoubleTreeMap velocityLookUpTable = new InterpolatingDoubleTreeMap();
-    private final Follower followerControl = new Follower(left.getDeviceID(), MotorAlignmentValue.Opposed);
+    private final Follower followerControl = new Follower(leftMotor.getDeviceID(), MotorAlignmentValue.Opposed);
     private final VelocityVoltage velocityVoltageControl = new VelocityVoltage(0).withSlot(0);
 
     public Shooter() {
@@ -65,63 +65,63 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setVelocity(final double rotationsPerSecond) {
-        left.setControl(
+        leftMotor.setControl(
                 velocityVoltageControl
                         .withVelocity(rotationsPerSecond)
                         .withFeedForward(Volts.of(0)));
     }
 
-    public boolean isShooterNearRotationsPerSecond(final double rotationsPerSecond, final double tolerance) {
-        return left.getVelocity().isNear(rotationsPerSecond, tolerance);
+    public boolean isNearRotationsPerSecond(final double rotationsPerSecond, final double tolerance) {
+        return leftMotor.getVelocity().isNear(rotationsPerSecond, tolerance);
     }
 
     public void stop() {
-        left.stopMotor();
+        leftMotor.stopMotor();
     }
 
-    @Logged(name = "Left Velocity")
-    public double getLeftVelocity() {
-        return left.getVelocity().getValueAsDouble();
+    @Logged(name = "Left motor Velocity")
+    public double getLeftMotorVelocity() {
+        return leftMotor.getVelocity().getValueAsDouble();
     }
 
-    @Logged(name = "Left Stator Current")
-    public double getLeftStatorCurrent() {
-        return left.getStatorCurrent().getValueAsDouble();
+    @Logged(name = "Left motor Stator Current")
+    public double getLeftMotorStatorCurrent() {
+        return leftMotor.getStatorCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Left Supply Current")
-    public double getLeftSupplyCurrent() {
-        return left.getSupplyCurrent().getValueAsDouble();
+    @Logged(name = "Left motor Supply Current")
+    public double getLeftMotorSupplyCurrent() {
+        return leftMotor.getSupplyCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Upper Right Velocity")
-    public double getUpperRightVelocity() {
-        return upperRight.getVelocity().getValueAsDouble();
+    @Logged(name = "Upper Right motor Velocity")
+    public double getUpperRightMotorVelocity() {
+        return upperRightMotor.getVelocity().getValueAsDouble();
     }
 
-    @Logged(name = "Upper Right Stator Current")
-    public double getUpperRightStatorCurrent() {
-        return upperRight.getStatorCurrent().getValueAsDouble();
+    @Logged(name = "Upper Right motor Stator Current")
+    public double getUpperRightMotorStatorCurrent() {
+        return upperRightMotor.getStatorCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Upper Right Supply Current")
-    public double getUpperRightSupplyCurrent() {
-        return upperRight.getSupplyCurrent().getValueAsDouble();
+    @Logged(name = "Upper Right motor Supply Current")
+    public double getUpperRightMotorSupplyCurrent() {
+        return upperRightMotor.getSupplyCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Lower Right Velocity")
-    public double getLowerRightVelocity() {
-        return lowerRight.getVelocity().getValueAsDouble();
+    @Logged(name = "Lower Right motor Velocity")
+    public double getLowerRightMotorVelocity() {
+        return lowerRightMotor.getVelocity().getValueAsDouble();
     }
 
-    @Logged(name = "Lower Right Stator Current")
-    public double getLowerRightStatorCurrent() {
-        return lowerRight.getStatorCurrent().getValueAsDouble();
+    @Logged(name = "Lower Right motor Stator Current")
+    public double getLowerRightMotorStatorCurrent() {
+        return lowerRightMotor.getStatorCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Lower Right Supply Current")
-    public double getLowerRightSupplyCurrent() {
-        return lowerRight.getSupplyCurrent().getValueAsDouble();
+    @Logged(name = "Lower Right motor Supply Current")
+    public double getLowerRightMotorSupplyCurrent() {
+        return lowerRightMotor.getSupplyCurrent().getValueAsDouble();
     }
 
     private void configureVelocityMap() {
@@ -162,15 +162,15 @@ public class Shooter extends SubsystemBase {
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
 
-        left.getConfigurator().apply(talonFXConfiguration);
-        left.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        leftMotor.getConfigurator().apply(talonFXConfiguration);
+        leftMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
 
-        lowerRight.getConfigurator().apply(talonFXConfiguration);
-        lowerRight.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        lowerRight.setControl(followerControl);
+        lowerRightMotor.getConfigurator().apply(talonFXConfiguration);
+        lowerRightMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        lowerRightMotor.setControl(followerControl);
 
-        upperRight.getConfigurator().apply(talonFXConfiguration);
-        upperRight.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        upperRight.setControl(followerControl);
+        upperRightMotor.getConfigurator().apply(talonFXConfiguration);
+        upperRightMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        upperRightMotor.setControl(followerControl);
     }
 }

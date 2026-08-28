@@ -31,9 +31,9 @@ public class Loader extends SubsystemBase {
         }
     }
 
-    private final TalonFX left = new TalonFX(4);
-    private final TalonFX right = new TalonFX(5);
-    private final Follower followerControl = new Follower(left.getDeviceID(), MotorAlignmentValue.Opposed);
+    private final TalonFX leftMotor = new TalonFX(4);
+    private final TalonFX rightMotor = new TalonFX(5);
+    private final Follower followerControl = new Follower(leftMotor.getDeviceID(), MotorAlignmentValue.Opposed);
     private final VelocityVoltage velocityVoltageControl = new VelocityVoltage(0).withSlot(0);
 
     public Loader() {
@@ -41,48 +41,48 @@ public class Loader extends SubsystemBase {
     }
 
     public void setLoaderVelocity(final double rotationsPerSecond) {
-        left.setControl(
+        leftMotor.setControl(
                 velocityVoltageControl
                         .withVelocity(rotationsPerSecond)
                         .withFeedForward(Volts.of(0)));
     }
 
     public boolean isLoaderNearRotationsPerSecond(final double rotationsPerSecond, final double tolerance) {
-        return left.getVelocity().isNear(rotationsPerSecond, tolerance);
+        return leftMotor.getVelocity().isNear(rotationsPerSecond, tolerance);
     }
 
-    public void stopLoader() {
-        left.stopMotor();
+    public void stop() {
+        leftMotor.stopMotor();
     }
 
-    @Logged(name = "Left Velocity")
-    public double getLeftVelocity() {
-        return left.getVelocity().getValueAsDouble();
+    @Logged(name = "Left Motor Velocity")
+    public double getLeftMotorVelocity() {
+        return leftMotor.getVelocity().getValueAsDouble();
     }
 
-    @Logged(name = "Left Stator Current")
-    public double getLeftStatorCurrent() {
-        return left.getStatorCurrent().getValueAsDouble();
+    @Logged(name = "Left Motor Stator Current")
+    public double getLeftMotorStatorCurrent() {
+        return leftMotor.getStatorCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Left Supply Current")
-    public double getLeftSupplyCurrent() {
-        return left.getSupplyCurrent().getValueAsDouble();
+    @Logged(name = "Left Motor Supply Current")
+    public double getLeftMotorSupplyCurrent() {
+        return leftMotor.getSupplyCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Right Velocity")
-    public double getRightVelocity() {
-        return right.getVelocity().getValueAsDouble();
+    @Logged(name = "Right Motor Velocity")
+    public double getRightMotorVelocity() {
+        return rightMotor.getVelocity().getValueAsDouble();
     }
 
-    @Logged(name = "Right Stator Current")
-    public double getRightStatorCurrent() {
-        return right.getStatorCurrent().getValueAsDouble();
+    @Logged(name = "Right Motor Stator Current")
+    public double getRightMotorStatorCurrent() {
+        return rightMotor.getStatorCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Right Supply Current")
-    public double getRightSupplyCurrent() {
-        return right.getSupplyCurrent().getValueAsDouble();
+    @Logged(name = "Right Motor Supply Current")
+    public double getRightMotorSupplyCurrent() {
+        return rightMotor.getSupplyCurrent().getValueAsDouble();
     }
 
     private void configureLoader() {
@@ -103,11 +103,11 @@ public class Loader extends SubsystemBase {
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
 
-        left.getConfigurator().apply(talonFXConfiguration);
-        left.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        leftMotor.getConfigurator().apply(talonFXConfiguration);
+        leftMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
 
-        right.getConfigurator().apply(talonFXConfiguration);
-        right.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        right.setControl(followerControl);
+        rightMotor.getConfigurator().apply(talonFXConfiguration);
+        rightMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        rightMotor.setControl(followerControl);
     }
 }

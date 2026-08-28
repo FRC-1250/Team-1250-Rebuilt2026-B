@@ -41,7 +41,7 @@ public class Hopper extends SubsystemBase {
 
     }
 
-    private final TalonFX deploy = new TalonFX(30);
+    private final TalonFX hopperMotor = new TalonFX(30);
     private final DigitalInput homeSensor = new DigitalInput(1);
     private final PositionVoltage hopperPositionVoltage = new PositionVoltage(0).withSlot(1);
     private final PositionVoltage hopperHoldPosition = new PositionVoltage(0).withSlot(2);
@@ -51,35 +51,33 @@ public class Hopper extends SubsystemBase {
     }
 
     public void setPosition(double rotations) {
-        deploy.setControl(
+        hopperMotor.setControl(
                 hopperPositionVoltage
                         .withPosition(rotations)
                         .withFeedForward(Volts.of(0)));
     }
 
     public void holdPosition() {
-        var pos = deploy.getPosition().waitForUpdate(0.02);
-        deploy.setControl(
+        var pos = hopperMotor.getPosition().waitForUpdate(0.02);
+        hopperMotor.setControl(
                 hopperHoldPosition
                         .withPosition(pos.getValueAsDouble()));
     }
 
     public void resetPosition(double rotations) {
-        deploy.setPosition(rotations);
+        hopperMotor.setPosition(rotations);
     }
 
     public void stop() {
-        deploy.stopMotor();
+        hopperMotor.stopMotor();
     }
 
-    @Logged(name = "Is near current")
-    public boolean isNearAmps() {
-        return deploy.getStatorCurrent().isNear(30, 1);
+    public boolean isNearAmps(double current, double tolerance) {
+        return hopperMotor.getStatorCurrent().isNear(current, tolerance);
     }
 
-    @Logged(name = "Is near position")
     public boolean isNearPosition(double rotations, double tolerance) {
-        return deploy.getPosition().isNear(rotations, tolerance);
+        return hopperMotor.getPosition().isNear(rotations, tolerance);
     }
 
     @Logged(name = "Sensor state")
@@ -87,19 +85,19 @@ public class Hopper extends SubsystemBase {
         return homeSensor.get();
     }
 
-    @Logged(name = "Position")
-    public double getHopperPosition() {
-        return deploy.getPosition().getValueAsDouble();
+    @Logged(name = "Motor Position")
+    public double getMotorPosition() {
+        return hopperMotor.getPosition().getValueAsDouble();
     }
 
-    @Logged(name = "Stator current")
-    public double getHopperStatorCurrent() {
-        return deploy.getStatorCurrent().getValueAsDouble();
+    @Logged(name = "Motor Stator current")
+    public double getMotorStatorCurrent() {
+        return hopperMotor.getStatorCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Supply current")
-    public double getHopperSupplyCurrent() {
-        return deploy.getSupplyCurrent().getValueAsDouble();
+    @Logged(name = "Motor Supply current")
+    public double getMotorSupplyCurrent() {
+        return hopperMotor.getSupplyCurrent().getValueAsDouble();
     }
 
     private void configureMotionMagicHopper() {
@@ -140,9 +138,9 @@ public class Hopper extends SubsystemBase {
         motionMagicConfigs.MotionMagicAcceleration = 64;
         motionMagicConfigs.MotionMagicAcceleration = 256;
 
-        deploy.getConfigurator().apply(talonFXConfiguration);
-        deploy.setPosition(0);
-        deploy.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        hopperMotor.getConfigurator().apply(talonFXConfiguration);
+        hopperMotor.setPosition(0);
+        hopperMotor.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
     }
 
 }

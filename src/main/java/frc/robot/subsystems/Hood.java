@@ -39,7 +39,7 @@ public class Hood {
         configureHood();
     }
 
-    public void setReactionBarPosition(final double rotations) {
+    public void setPosition(final double rotations) {
         hoodMotor.setControl(
                 positionVoltageControl
                         .withPosition(rotations)
@@ -47,26 +47,26 @@ public class Hood {
 
     }
 
-    public void stopReactionBar() {
+    public void stop() {
         hoodMotor.stopMotor();
     }
 
     public boolean isNearPosition(final double rotations, final double tolerance) {
-        return hoodEncoder.getPosition().isNear(rotations, tolerance);
+        return hoodEncoder.getAbsolutePosition().isNear(rotations, tolerance);
     }
 
-    @Logged(name = "Abs position")
-    public double getReactionBarPosition() {
+    @Logged(name = "Encoder Abs position")
+    public double getEncoderAbsolutePosition() {
         return hoodEncoder.getAbsolutePosition().getValueAsDouble();
     }
 
-    @Logged(name = "Stator current")
-    public double getReactionBarStatorCurrent() {
+    @Logged(name = "Motor Stator current")
+    public double getMotorStatorCurrent() {
         return hoodMotor.getStatorCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Supply current")
-    public double getReactionBarSupplyCurrent() {
+    @Logged(name = "Motor Supply current")
+    public double getMotorSupplyCurrent() {
         return hoodMotor.getSupplyCurrent().getValueAsDouble();
     }
 
