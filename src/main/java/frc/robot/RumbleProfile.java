@@ -5,13 +5,13 @@ import java.util.List;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class VibrationProfile {
+public class RumbleProfile {
 
     private Timer timer;
     private List<VibrationStep> steps;
     private int index;
 
-    public VibrationProfile() {
+    public RumbleProfile() {
         this.steps = new ArrayList<>();
         this.timer = new Timer();
         index = 0;
