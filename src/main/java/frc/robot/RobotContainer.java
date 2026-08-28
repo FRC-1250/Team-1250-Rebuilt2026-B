@@ -123,6 +123,6 @@ public class RobotContainer {
         hubActiveSoon.onTrue(Commands.run(() -> LightButtons.setRumble(RumbleType.kBothRumble, 0.5)));
 
         RumbleProfile pulse = new RumbleProfile();
-        pulse.addStep(new VibrationStep(RumbleType.kBothRumble, 1.0, 0.25));
+        pulse.addStep(new RumbleStep(RumbleType.kBothRumble, 1.0, 0.25));
     }
 }

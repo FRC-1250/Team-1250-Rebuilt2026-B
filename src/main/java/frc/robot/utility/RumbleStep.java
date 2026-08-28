@@ -2,12 +2,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
-public class VibrationStep {
+public class RumbleStep {
     private RumbleType rumbleType;
     private double intensity;
     private double interval;
 
-    public VibrationStep(RumbleType rumbleType, double intensity, double interval) {
+    public RumbleStep(RumbleType rumbleType, double intensity, double interval) {
         this.rumbleType = rumbleType;
         this.intensity = intensity;
         this.interval = interval;

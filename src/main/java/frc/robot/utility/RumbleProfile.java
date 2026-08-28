@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
 public class RumbleProfile {
 
     private Timer timer;
-    private List<VibrationStep> steps;
+    private List<RumbleStep> steps;
     private int index;
 
     public RumbleProfile() {
@@ -17,7 +17,7 @@ public class RumbleProfile {
         index = 0;
     }
 
-    public void addStep(VibrationStep as) {
+    public void addStep(RumbleStep as) {
         if (as.getInterval() > 0)
             this.steps.add(as);
     }
