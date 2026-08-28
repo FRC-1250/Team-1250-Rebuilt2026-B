@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.Volts;
@@ -19,12 +20,6 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Intake extends SubsystemBase {
-    private TalonFX IntakePlaceholder1 = new TalonFX(7); // Used as the leader placeholder
-    private TalonFX IntakePlaceholder2 = new TalonFX(30); // Used as the follower placeholder
-    private final VelocityVoltage IntakePlaceholder1VelocityControl = new VelocityVoltage(0).withSlot(0);
-    private final Follower IntakePlaceholder2FollowerControl = new Follower(
-            IntakePlaceholder1.getDeviceID(),
-            MotorAlignmentValue.Opposed);
 
     public enum IntakeVelocity {
         UNJAM(-25),
@@ -33,49 +28,86 @@ public class Intake extends SubsystemBase {
         // All placeholder values
         public double rotationsPerSecond;
 
-        private IntakeVelocity(double rotationsPerSecond) {
+        private IntakeVelocity(final double rotationsPerSecond) {
             this.rotationsPerSecond = rotationsPerSecond;
         }
     }
 
-    /** Creates a new Intake. */
+    private final TalonFX left = new TalonFX(7);
+    private final TalonFX right = new TalonFX(30);
+    private final Follower followerControl = new Follower(left.getDeviceID(), MotorAlignmentValue.Opposed);
+    private final VelocityVoltage velocityVoltageControl = new VelocityVoltage(0).withSlot(0);
+
     public Intake() {
         configureIntake();
     }
 
+    public void setIntakeVelocity(final double rotationsPerSecond) {
+        left.setControl(
+                velocityVoltageControl
+                        .withVelocity(rotationsPerSecond)
+                        .withFeedForward(Volts.of(0)));
+    }
+
+    public boolean isIntakeNearRotationsPerSecond(final double rotationsPerSecond, final double tolerance) {
+        return left.getVelocity().isNear(rotationsPerSecond, tolerance);
+    }
+
+    public void stopIntake() {
+        left.stopMotor();
+    }
+
+    @Logged(name = "Left Velocity")
+    public double getLeftVelocity() {
+        return left.getVelocity().getValueAsDouble();
+    }
+
+    @Logged(name = "Left Stator Current")
+    public double getLeftStatorCurrent() {
+        return left.getStatorCurrent().getValueAsDouble();
+    }
+
+    @Logged(name = "Left Supply Current")
+    public double getLeftSupplyCurrent() {
+        return left.getSupplyCurrent().getValueAsDouble();
+    }
+
+    @Logged(name = "Right Velocity")
+    public double getRightVelocity() {
+        return right.getVelocity().getValueAsDouble();
+    }
+
+    @Logged(name = "Right Stator Current")
+    public double getRightStatorCurrent() {
+        return right.getStatorCurrent().getValueAsDouble();
+    }
+
+    @Logged(name = "Right Supply Current")
+    public double getRightSupplyCurrent() {
+        return right.getSupplyCurrent().getValueAsDouble();
+    }
+
     private void configureIntake() {
-        MotorOutputConfigs motorOutputConfigsUpper = new MotorOutputConfigs();
-        motorOutputConfigsUpper.NeutralMode = NeutralModeValue.Coast;
-        motorOutputConfigsUpper.Inverted = InvertedValue.Clockwise_Positive;
+        final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
+        motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
+        motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
 
-        MotorOutputConfigs motorOutputConfigsLower = new MotorOutputConfigs();
-        motorOutputConfigsLower.NeutralMode = NeutralModeValue.Coast;
-        motorOutputConfigsLower.Inverted = InvertedValue.Clockwise_Positive;
-
-        Slot0Configs velocityGains = new Slot0Configs()
+        final Slot0Configs velocityGains = new Slot0Configs()
                 .withKS(0.1)
                 .withKV(0.11)
                 .withKP(0.5)
                 .withKI(0)
                 .withKD(0);
 
-        TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
+        final TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
         talonFXConfiguration.Slot0 = velocityGains;
-        // Try default limits. Supply = 70 amp, stator = 120 amp, reduce supply to 40
-        // amps after 1 second
-        // talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = 70;
-        // talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
+        talonFXConfiguration.MotorOutput = motorOutputConfigs;
 
-        IntakePlaceholder1.getConfigurator().apply(talonFXConfiguration);
-        IntakePlaceholder1.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        left.getConfigurator().apply(talonFXConfiguration);
+        left.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
 
-        IntakePlaceholder2.getConfigurator().apply(talonFXConfiguration);
-        IntakePlaceholder2.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        IntakePlaceholder2.setControl(IntakePlaceholder2FollowerControl);
-    }
-
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
+        right.getConfigurator().apply(talonFXConfiguration);
+        right.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        right.setControl(followerControl);
     }
 }

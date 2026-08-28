@@ -20,13 +20,13 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Loader extends SubsystemBase {
-    public enum ShooterVelocity {
+    public enum LoaderVelocity {
         UNJAM(-10),
         LOAD(25);
 
         public double rotationsPerSecond;
 
-        ShooterVelocity(final double shooterRotationsPerSecond) {
+        LoaderVelocity(final double shooterRotationsPerSecond) {
             this.rotationsPerSecond = shooterRotationsPerSecond;
         }
     }
@@ -40,18 +40,18 @@ public class Loader extends SubsystemBase {
         configureLoader();
     }
 
-    public void setAcceleratorVelocity(final double rotationsPerSecond) {
+    public void setLoaderVelocity(final double rotationsPerSecond) {
         left.setControl(
                 velocityVoltageControl
                         .withVelocity(rotationsPerSecond)
                         .withFeedForward(Volts.of(0)));
     }
 
-    public boolean isAcceleratorNearRotationsPerSecond(final double rotationsPerSecond, final double tolerance) {
+    public boolean isLoaderNearRotationsPerSecond(final double rotationsPerSecond, final double tolerance) {
         return left.getVelocity().isNear(rotationsPerSecond, tolerance);
     }
 
-    public void stopAccelerator() {
+    public void stopLoader() {
         left.stopMotor();
     }
 

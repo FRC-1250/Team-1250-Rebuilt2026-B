@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Loader;
@@ -26,7 +27,6 @@ import frc.robot.utility.HubTracker.Shift;
 
 public class RobotContainer {
 
-    /* Subsystems */
     private final CommandSwerveDrivetrain swerve = TunerConstants.createDrivetrain();
     private final Limelight limelight = new Limelight("limelight", LimelightLocalizationMode.ENABLED);
     private final Limelight limelightRear = new Limelight("limelight-rear", LimelightLocalizationMode.DISABED);
@@ -41,6 +41,10 @@ public class RobotContainer {
 
     @Logged(name = "Loader")
     private final Loader loader = new Loader();
+
+    @Logged(name = "Intake")
+    private final Intake intake = new Intake();
+
     private final double SHIFT_CLOCK_WARNING = 8.0;
     private final double SHIFT_CLOCK_PRE_FIRE = 2.0;
     private double timeLeftInShift = 0;
