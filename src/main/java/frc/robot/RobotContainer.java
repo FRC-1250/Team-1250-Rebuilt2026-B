@@ -15,11 +15,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Loader;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Limelight.LimelightLocalizationMode;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.utility.HubTracker;
@@ -39,6 +41,12 @@ public class RobotContainer {
 
     @Logged(name = "Intake")
     private final Intake intake = new Intake();
+
+    @Logged(name = "Indexer")
+    private final Indexer indexer = new Indexer();
+
+    @Logged(name = "Hopper")
+    private final Hopper hopper = new Hopper();
 
     private final CommandFactory commandFactory = new CommandFactory(
             swerve,

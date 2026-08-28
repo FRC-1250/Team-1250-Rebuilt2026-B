@@ -64,7 +64,7 @@ public class Shooter extends SubsystemBase {
                 ShooterVelocity.MIN.rotationsPerSecond);
     }
 
-    public void setShooterVelocity(final double rotationsPerSecond) {
+    public void setVelocity(final double rotationsPerSecond) {
         left.setControl(
                 velocityVoltageControl
                         .withVelocity(rotationsPerSecond)
@@ -75,7 +75,7 @@ public class Shooter extends SubsystemBase {
         return left.getVelocity().isNear(rotationsPerSecond, tolerance);
     }
 
-    public void stopShooter() {
+    public void stop() {
         left.stopMotor();
     }
 

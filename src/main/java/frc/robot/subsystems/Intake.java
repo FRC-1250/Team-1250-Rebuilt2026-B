@@ -34,7 +34,7 @@ public class Intake extends SubsystemBase {
     }
 
     private final TalonFX left = new TalonFX(7);
-    private final TalonFX right = new TalonFX(30);
+    private final TalonFX right = new TalonFX(8);
     private final Follower followerControl = new Follower(left.getDeviceID(), MotorAlignmentValue.Opposed);
     private final VelocityVoltage velocityVoltageControl = new VelocityVoltage(0).withSlot(0);
 
