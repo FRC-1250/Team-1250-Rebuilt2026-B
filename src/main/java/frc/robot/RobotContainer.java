@@ -29,13 +29,8 @@ public class RobotContainer {
 
     private final CommandSwerveDrivetrain swerve = TunerConstants.createDrivetrain();
     private final Limelight limelight = new Limelight("limelight", LimelightLocalizationMode.ENABLED);
-    private final Limelight limelightRear = new Limelight("limelight-rear", LimelightLocalizationMode.DISABED);
     private final LED systemLights = new LED();
-    private final CommandXboxController LightButtons = new CommandXboxController(0);
-    public final CommandFactory commandFactory = new CommandFactory(
-            swerve,
-            List.of(limelight, limelightRear),
-            systemLights);
+
     @Logged(name = "Shooter")
     private final Shooter shooter = new Shooter();
 
@@ -45,12 +40,39 @@ public class RobotContainer {
     @Logged(name = "Intake")
     private final Intake intake = new Intake();
 
+    private final CommandFactory commandFactory = new CommandFactory(
+            swerve,
+            List.of(limelight),
+            systemLights);
+
+    private final CommandXboxController LightButtons = new CommandXboxController(0);
+
     private final double SHIFT_CLOCK_WARNING = 8.0;
     private final double SHIFT_CLOCK_PRE_FIRE = 2.0;
     private double timeLeftInShift = 0;
     private Shift shift = Shift.AUTO;
     private Optional<Time> timeOpt;
     private Optional<Shift> shiftOpt;
+
+    private final Trigger hubInactive = new Trigger(
+            () -> (timeLeftInShift > SHIFT_CLOCK_WARNING
+                    && !HubTracker.isActive()));
+
+    private final Trigger hubActiveSoon = new Trigger(
+            () -> (timeLeftInShift <= SHIFT_CLOCK_WARNING
+                    && timeLeftInShift > SHIFT_CLOCK_PRE_FIRE
+                    && !HubTracker.isActive()));
+
+    private final Trigger hubActivePreFire = new Trigger(
+            () -> (timeLeftInShift <= SHIFT_CLOCK_PRE_FIRE
+                    && !HubTracker.isActive()));
+
+    private final Trigger hubActive = new Trigger(
+            () -> HubTracker.isActive());
+
+    public RobotContainer() {
+        configureBindings();
+    }
 
     public Shift getShift() {
         return shift;
@@ -76,24 +98,8 @@ public class RobotContainer {
         }
     }
 
-    private final Trigger hubInactive = new Trigger(
-            () -> (timeLeftInShift > SHIFT_CLOCK_WARNING
-                    && !HubTracker.isActive()));
-
-    private final Trigger hubActiveSoon = new Trigger(
-            () -> (timeLeftInShift <= SHIFT_CLOCK_WARNING
-                    && timeLeftInShift > SHIFT_CLOCK_PRE_FIRE
-                    && !HubTracker.isActive()));
-
-    private final Trigger hubActivePreFire = new Trigger(
-            () -> (timeLeftInShift <= SHIFT_CLOCK_PRE_FIRE
-                    && !HubTracker.isActive()));
-
-    private final Trigger hubActive = new Trigger(
-            () -> HubTracker.isActive());
-
-    public RobotContainer() {
-        configureBindings();
+    public Command getAutonomousCommand() {
+        return Commands.print("No autonomous command configured");
     }
 
     private void configureBindings() {
@@ -106,9 +112,5 @@ public class RobotContainer {
 
         VibrationProfile pulse = new VibrationProfile();
         pulse.addStep(new VibrationStep(RumbleType.kBothRumble, 1.0, 0.25));
-    }
-
-    public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
     }
 }
