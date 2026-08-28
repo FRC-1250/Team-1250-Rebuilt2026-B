@@ -26,6 +26,8 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Limelight.LimelightLocalizationMode;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.utility.HubTracker;
+import frc.robot.utility.RumbleProfile;
+import frc.robot.utility.RumbleStep;
 import frc.robot.utility.HubTracker.Shift;
 
 public class RobotContainer {
