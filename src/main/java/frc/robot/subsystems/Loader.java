@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Frequency;
-//This is basically the accelerator I think so use stuff from that
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Hertz;
@@ -21,85 +20,94 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Loader extends SubsystemBase {
-    private TalonFX LoaderPlaceholder1 = new TalonFX(1); // Used as the leader placeholder
-    private TalonFX LoaderPlaceholder2 = new TalonFX(3); // Used as the follower placeholder
-    private final VelocityVoltage loaderVelocityControl = new VelocityVoltage(0).withSlot(0);
-    private final Follower LoaderPlaceholder2Control = new Follower(LoaderPlaceholder1.getDeviceID(),
-            MotorAlignmentValue.Opposed);
+    public enum ShooterVelocity {
+        UNJAM(-10),
+        LOAD(25);
 
-    public void setAcceleratorVelocity(double rotationsPerSecond) {
-        LoaderPlaceholder1.setControl(
-                loaderVelocityControl
-                        .withVelocity(rotationsPerSecond)
-                        .withFeedForward(Volts.of(0)));
+        public double rotationsPerSecond;
+
+        ShooterVelocity(final double shooterRotationsPerSecond) {
+            this.rotationsPerSecond = shooterRotationsPerSecond;
+        }
     }
 
-    public boolean isAcceleratorNearRotationsPerSecond(double rotationsPerSecond, double tolerance) {
-        return LoaderPlaceholder1.getVelocity().isNear(rotationsPerSecond, tolerance);
-    }
+    private final TalonFX left = new TalonFX(4);
+    private final TalonFX right = new TalonFX(5);
+    private final Follower followerControl = new Follower(left.getDeviceID(), MotorAlignmentValue.Opposed);
+    private final VelocityVoltage velocityVoltageControl = new VelocityVoltage(0).withSlot(0);
 
-    /** Creates a new Loader. */
     public Loader() {
         configureLoader();
     }
 
+    public void setAcceleratorVelocity(final double rotationsPerSecond) {
+        left.setControl(
+                velocityVoltageControl
+                        .withVelocity(rotationsPerSecond)
+                        .withFeedForward(Volts.of(0)));
+    }
+
+    public boolean isAcceleratorNearRotationsPerSecond(final double rotationsPerSecond, final double tolerance) {
+        return left.getVelocity().isNear(rotationsPerSecond, tolerance);
+    }
+
     public void stopAccelerator() {
-        LoaderPlaceholder1.stopMotor();
+        left.stopMotor();
+    }
+
+    @Logged(name = "Left Velocity")
+    public double getLeftVelocity() {
+        return left.getVelocity().getValueAsDouble();
+    }
+
+    @Logged(name = "Left Stator Current")
+    public double getLeftStatorCurrent() {
+        return left.getStatorCurrent().getValueAsDouble();
+    }
+
+    @Logged(name = "Left Supply Current")
+    public double getLeftSupplyCurrent() {
+        return left.getSupplyCurrent().getValueAsDouble();
+    }
+
+    @Logged(name = "Right Velocity")
+    public double getRightVelocity() {
+        return right.getVelocity().getValueAsDouble();
+    }
+
+    @Logged(name = "Right Stator Current")
+    public double getRightStatorCurrent() {
+        return right.getStatorCurrent().getValueAsDouble();
+    }
+
+    @Logged(name = "Right Supply Current")
+    public double getRightSupplyCurrent() {
+        return right.getSupplyCurrent().getValueAsDouble();
     }
 
     private void configureLoader() {
-        MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
+        final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
         motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
         motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
 
-        Slot0Configs velocityGains = new Slot0Configs()
+        final Slot0Configs velocityGains = new Slot0Configs()
                 .withKS(0.09)
                 .withKV(0.11)
                 .withKP(0.15)
                 .withKI(0)
                 .withKD(0);
 
-        TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
+        final TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
         talonFXConfiguration.Slot0 = velocityGains;
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = 50;
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
 
-        LoaderPlaceholder1.getConfigurator().apply(talonFXConfiguration);
-        LoaderPlaceholder1.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        left.getConfigurator().apply(talonFXConfiguration);
+        left.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
 
-        LoaderPlaceholder2.getConfigurator().apply(talonFXConfiguration);
-        LoaderPlaceholder2.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        LoaderPlaceholder2.setControl(LoaderPlaceholder2Control);
-    }
-
-    @Logged(name = "Accelerator velocity")
-    public double getAcceleratorVelocity() {
-        return LoaderPlaceholder1.getVelocity().getValueAsDouble();
-    }
-
-    @Logged(name = "Accelerator leader stator current")
-    public double getAcceleratorLeaderStatorCurrent() {
-        return LoaderPlaceholder1.getStatorCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Accelerator leader supply current")
-    public double getAcceleratorLeaderSupplyCurrent() {
-        return LoaderPlaceholder1.getSupplyCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Accelerator follower stator current")
-    public double getAcceleratorFollowerStatorCurrent() {
-        return LoaderPlaceholder2.getStatorCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Accelerator follower supply current")
-    public double getAcceleratorFollowerSupplyCurrent() {
-        return LoaderPlaceholder2.getSupplyCurrent().getValueAsDouble();
-    }
-
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
+        right.getConfigurator().apply(talonFXConfiguration);
+        right.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        right.setControl(followerControl);
     }
 }

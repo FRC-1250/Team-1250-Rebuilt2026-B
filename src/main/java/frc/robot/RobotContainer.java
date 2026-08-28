@@ -17,6 +17,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Loader;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Limelight.LimelightLocalizationMode;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -37,6 +38,9 @@ public class RobotContainer {
             systemLights);
     @Logged(name = "Shooter")
     private final Shooter shooter = new Shooter();
+
+    @Logged(name = "Loader")
+    private final Loader loader = new Loader();
     private final double SHIFT_CLOCK_WARNING = 8.0;
     private final double SHIFT_CLOCK_PRE_FIRE = 2.0;
     private double timeLeftInShift = 0;
