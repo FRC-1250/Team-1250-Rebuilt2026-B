@@ -22,7 +22,6 @@ import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Limelight.LimelightLocalizationMode;
 import frc.robot.subsystems.Loader;
@@ -123,6 +122,11 @@ public class RobotContainer {
                 swerve.getState(),
                 swerve.getOperatorForwardDirection());
         SmartDashboard.putString("Targeting State", targetManager.getTargetingState().toString());
+    }
+
+    public void updateVisionState() {
+        robotLocalization.processMegaTag2Measurement();
+        robotLocalization.processActiveZone();
     }
 
     private void configureBindings() {

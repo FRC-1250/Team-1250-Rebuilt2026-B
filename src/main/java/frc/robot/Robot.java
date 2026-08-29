@@ -4,42 +4,66 @@
 
 package frc.robot;
 
-import java.util.Optional;
+import com.pathplanner.lib.commands.FollowPathCommand;
 
+import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.utility.HubTracker;
-import frc.robot.utility.HubTracker.Shift;
+import frc.robot.telemetry.HealthMonitor;
+import frc.robot.utility.LimelightHelpers;
 
 public class Robot extends TimedRobot {
-    private Command m_autonomousCommand;
+    private Command autonomousCommand;
 
     @Logged(name = "Robot")
-    private final RobotContainer m_robotContainer;
+    private final RobotContainer robotContainer;
 
     public Robot() {
-        m_robotContainer = new RobotContainer();
+        robotContainer = new RobotContainer();
+
+        DriverStation.startDataLog(DataLogManager.getLog());
+        Epilogue.bind(this);
+        DriverStation.silenceJoystickConnectionWarning(true);
+
+        CommandScheduler.getInstance().onCommandInitialize(
+                command -> DataLogManager.log(
+                        String.format("Command init: %s, with requirements: %s", command.getName(),
+                                command.getRequirements())));
+
+        CommandScheduler.getInstance().onCommandFinish(
+                command -> DataLogManager.log(String.format("Command finished: %s", command.getName())));
+
+        CommandScheduler.getInstance().onCommandInterrupt(
+                command -> DataLogManager.log(String.format("Command interrupted: %s", command.getName())));
+    }
+
+    @Override
+    public void robotInit() {
+        HealthMonitor.getInstance().start();
+        CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+        LimelightHelpers.setupPortForwardingUSB(0);
     }
 
     @Override
     public void robotPeriodic() {
-        m_robotContainer.processShiftClock();
-        m_robotContainer.getTimeLeftInShift();
-
-        SmartDashboard.putNumber("Shift Time", m_robotContainer.getTimeLeftInShift());
-        SmartDashboard.putString("Shift", m_robotContainer.getShift().toString());
+        robotContainer.updateVisionState();
+        robotContainer.updateTargetState();
+        robotContainer.processShiftClock();
+        robotContainer.getTimeLeftInShift();
+        SmartDashboard.putNumber("Shift Time", robotContainer.getTimeLeftInShift());
+        SmartDashboard.putString("Shift", robotContainer.getShift().toString());
         SmartDashboard.putNumber("Match time", DriverStation.getMatchTime());
-
         CommandScheduler.getInstance().run();
     }
 
     @Override
     public void disabledInit() {
+        HealthMonitor.getInstance().unpause();
     }
 
     @Override
@@ -48,14 +72,15 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledExit() {
+        HealthMonitor.getInstance().pause();
     }
 
     @Override
     public void autonomousInit() {
-        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+        autonomousCommand = robotContainer.getAutonomousCommand();
 
-        if (m_autonomousCommand != null) {
-            CommandScheduler.getInstance().schedule(m_autonomousCommand);
+        if (autonomousCommand != null) {
+            CommandScheduler.getInstance().schedule(autonomousCommand);
         }
     }
 
@@ -69,8 +94,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        if (m_autonomousCommand != null) {
-            m_autonomousCommand.cancel();
+        if (autonomousCommand != null) {
+            autonomousCommand.cancel();
         }
 
     }
