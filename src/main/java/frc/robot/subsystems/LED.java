@@ -21,7 +21,6 @@ import com.ctre.phoenix6.signals.VBatOutputModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.LED.Animation;
 
 public class LED extends SubsystemBase {
     public enum Animation {
