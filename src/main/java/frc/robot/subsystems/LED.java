@@ -18,7 +18,10 @@ import com.ctre.phoenix6.signals.StatusLedWhenActiveValue;
 import com.ctre.phoenix6.signals.StripTypeValue;
 import com.ctre.phoenix6.signals.VBatOutputModeValue;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.LED.Animation;
 
 public class LED extends SubsystemBase {
     public enum Animation {
@@ -96,6 +99,14 @@ public class LED extends SubsystemBase {
 
     public void fillAnimationToStart(Animation animation, int endIndex) {
         setAnimation(animation, ACTUAL_LED_START, endIndex);
+    }
+
+    public Command cmdColorControl(RGBWColor newColor) {
+        return Commands.run(() -> setColor(newColor), this);
+    }
+
+    public Command cmdAnimationControl() {
+        return Commands.run(() -> setAnimation(Animation.RAINBOW), this);
     }
 
     private void setColor(RGBWColor newColor, int startIndex, int endIndex) {

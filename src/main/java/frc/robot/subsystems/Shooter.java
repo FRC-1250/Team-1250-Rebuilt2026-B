@@ -4,14 +4,8 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Frequency;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Hertz;
+
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -21,6 +15,14 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
 
@@ -44,19 +46,20 @@ public class Shooter extends SubsystemBase {
     private final TalonFX lowerRightMotor = new TalonFX(3);
     private final InterpolatingDoubleTreeMap velocityLookUpTable = new InterpolatingDoubleTreeMap();
     private final Follower followerControl = new Follower(leftMotor.getDeviceID(), MotorAlignmentValue.Opposed);
-    private final VelocityVoltage velocityVoltageControl = new VelocityVoltage(0).withSlot(0);
+    private final VelocityVoltage velocityControl = new VelocityVoltage(0).withSlot(0);
+    private final double CLOSED_LOOP_TOLERANCE = 5;
 
     public Shooter() {
         configureShooter();
         configureVelocityMap();
     }
 
-    public double getInterpolatedVelocity(final double distance) {
+    public double getInterpolatedVelocity(double distance) {
         // get handles interpolation for you
         return velocityLookUpTable.get(distance);
     }
 
-    public double getTargetVelocity(final double distance) {
+    public double getTargetVelocity(double distance) {
         // (meters, rps)
         // y = 15.36x (0,0) to (3.125, 48)
         // y = 56x - 127 (3.125, 48) to (3.25, 55)
@@ -64,19 +67,28 @@ public class Shooter extends SubsystemBase {
                 ShooterVelocity.MIN.rotationsPerSecond);
     }
 
-    public void setVelocity(final double rotationsPerSecond) {
-        leftMotor.setControl(
-                velocityVoltageControl
-                        .withVelocity(rotationsPerSecond)
-                        .withFeedForward(Volts.of(0)));
+    public void setMotorVelocity(double rotationsPerSecond) {
+        leftMotor.setControl(velocityControl.withVelocity(rotationsPerSecond));
     }
 
-    public boolean isNearRotationsPerSecond(final double rotationsPerSecond, final double tolerance) {
-        return leftMotor.getVelocity().isNear(rotationsPerSecond, tolerance);
+    public boolean isMotorAtVelocity(double rotationsPerSecond) {
+        return leftMotor.getVelocity().isNear(rotationsPerSecond, CLOSED_LOOP_TOLERANCE);
     }
 
-    public void stop() {
+    public void stopMotor() {
         leftMotor.stopMotor();
+    }
+
+    public Command cmdSetMotorVelocity(double rotationsPerSecond) {
+        return Commands.runOnce(() -> setMotorVelocity(rotationsPerSecond), this);
+    }
+
+    public Command cmdSetMotorVelocity(ShooterVelocity velocity) {
+        return cmdSetMotorVelocity(velocity.rotationsPerSecond);
+    }
+
+    public Command cmdStopMotor() {
+        return Commands.runOnce(() -> stopMotor(), this);
     }
 
     @Logged(name = "Left motor Velocity")
@@ -145,18 +157,18 @@ public class Shooter extends SubsystemBase {
     }
 
     private void configureShooter() {
-        final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
+        MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
         motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
         motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
 
-        final Slot0Configs velocityGains = new Slot0Configs()
+        Slot0Configs velocityGains = new Slot0Configs()
                 .withKS(0.09)
                 .withKV(0.11)
                 .withKP(0.25)
                 .withKI(0)
                 .withKD(0.01);
 
-        final TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
+        TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
         talonFXConfiguration.Slot0 = velocityGains;
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = 50;
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;

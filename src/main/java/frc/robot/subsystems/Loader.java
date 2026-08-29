@@ -6,8 +6,10 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static edu.wpi.first.units.Units.Volts;
+
 import static edu.wpi.first.units.Units.Hertz;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -26,33 +28,65 @@ public class Loader extends SubsystemBase {
 
         public double rotationsPerSecond;
 
-        LoaderVelocity(final double shooterRotationsPerSecond) {
-            this.rotationsPerSecond = shooterRotationsPerSecond;
+        LoaderVelocity(final double rotationsPerSecond) {
+            this.rotationsPerSecond = rotationsPerSecond;
         }
     }
 
     private final TalonFX leftMotor = new TalonFX(4);
     private final TalonFX rightMotor = new TalonFX(5);
     private final Follower followerControl = new Follower(leftMotor.getDeviceID(), MotorAlignmentValue.Opposed);
-    private final VelocityVoltage velocityVoltageControl = new VelocityVoltage(0).withSlot(0);
+    private final VelocityVoltage velocityControl = new VelocityVoltage(0).withSlot(0);
+    private final double CLOSED_LOOP_TOLERANCE = 5;
 
     public Loader() {
-        configureLoader();
+        MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
+        motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
+        motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
+
+        Slot0Configs velocityGains = new Slot0Configs()
+                .withKS(0.09)
+                .withKV(0.11)
+                .withKP(0.15)
+                .withKI(0)
+                .withKD(0);
+
+        TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
+        talonFXConfiguration.Slot0 = velocityGains;
+        talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = 50;
+        talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
+        talonFXConfiguration.MotorOutput = motorOutputConfigs;
+
+        leftMotor.getConfigurator().apply(talonFXConfiguration);
+        leftMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+
+        rightMotor.getConfigurator().apply(talonFXConfiguration);
+        rightMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        rightMotor.setControl(followerControl);
     }
 
-    public void setLoaderVelocity(final double rotationsPerSecond) {
-        leftMotor.setControl(
-                velocityVoltageControl
-                        .withVelocity(rotationsPerSecond)
-                        .withFeedForward(Volts.of(0)));
+    public void setMotorVelocity(double rotationsPerSecond) {
+        leftMotor.setControl(velocityControl.withVelocity(rotationsPerSecond));
     }
 
-    public boolean isLoaderNearRotationsPerSecond(final double rotationsPerSecond, final double tolerance) {
-        return leftMotor.getVelocity().isNear(rotationsPerSecond, tolerance);
+    public boolean isMotorAtVelocity(double rotationsPerSecond) {
+        return leftMotor.getVelocity().isNear(rotationsPerSecond, CLOSED_LOOP_TOLERANCE);
     }
 
-    public void stop() {
+    public void stopMotor() {
         leftMotor.stopMotor();
+    }
+
+    public Command cmdSetMotorVelocity(double rotationsPerSecond) {
+        return Commands.runOnce(() -> setMotorVelocity(rotationsPerSecond), this);
+    }
+
+    public Command cmdSetMotorVelocity(LoaderVelocity velocity) {
+        return cmdSetMotorVelocity(velocity.rotationsPerSecond);
+    }
+
+    public Command cmdStopMotor() {
+        return Commands.runOnce(() -> stopMotor(), this);
     }
 
     @Logged(name = "Left Motor Velocity")
@@ -83,31 +117,5 @@ public class Loader extends SubsystemBase {
     @Logged(name = "Right Motor Supply Current")
     public double getRightMotorSupplyCurrent() {
         return rightMotor.getSupplyCurrent().getValueAsDouble();
-    }
-
-    private void configureLoader() {
-        final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
-        motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
-        motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
-
-        final Slot0Configs velocityGains = new Slot0Configs()
-                .withKS(0.09)
-                .withKV(0.11)
-                .withKP(0.15)
-                .withKI(0)
-                .withKD(0);
-
-        final TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
-        talonFXConfiguration.Slot0 = velocityGains;
-        talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = 50;
-        talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
-        talonFXConfiguration.MotorOutput = motorOutputConfigs;
-
-        leftMotor.getConfigurator().apply(talonFXConfiguration);
-        leftMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-
-        rightMotor.getConfigurator().apply(talonFXConfiguration);
-        rightMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        rightMotor.setControl(followerControl);
     }
 }

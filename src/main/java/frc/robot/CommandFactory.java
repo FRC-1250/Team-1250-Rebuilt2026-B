@@ -1,198 +1,98 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import java.util.function.DoubleSupplier;
 
-import java.util.List;
-
-import com.ctre.phoenix6.signals.RGBWColor;
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.LED;
-import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.LED.Animation;
-import frc.robot.utility.RobotLocalization;
-import frc.robot.utility.TargetManager;
+import frc.robot.subsystems.Hood;
+import frc.robot.subsystems.Hopper;
+import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.Indexer.IndexerVelocity;
+import frc.robot.subsystems.Intake.IntakeVelocity;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Loader;
+import frc.robot.subsystems.Loader.LoaderVelocity;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Hood.HoodPosition;
+import frc.robot.subsystems.Hopper.HopperPosition;
+import frc.robot.subsystems.Shooter.ShooterVelocity;
 
 public class CommandFactory {
-
-    private final TargetManager targetManager;
-    private final CommandSwerveDrivetrain swerve;
-    private final RobotLocalization robotLocalization;
-    private final LED systemLights;
+    private final Hood hood;
+    private final Hopper hopper;
+    private final Indexer indexer;
+    private final Intake intake;
+    private final Loader loader;
+    private final Shooter shooter;
 
     public CommandFactory(
-            CommandSwerveDrivetrain swerve,
-            List<Limelight> limelights,
-            LED systemLights) {
-        this.swerve = swerve;
-        this.systemLights = systemLights;
-        this.targetManager = new TargetManager();
-        this.robotLocalization = new RobotLocalization(limelights, swerve);
+            Hood hood,
+            Hopper hopper,
+            Indexer indexer,
+            Intake intake,
+            Loader loader,
+            Shooter shooter) {
+        this.hood = hood;
+        this.hopper = hopper;
+        this.indexer = indexer;
+        this.intake = intake;
+        this.loader = loader;
+        this.shooter = shooter;
     }
 
-    /*
-     * Drive
-     */
+    public Command cmdFireFuel(DoubleSupplier shooterVelocitySupplier, DoubleSupplier hoodPositionSupplier) {
+        return Commands.run(() -> {
+            double shooterVelocity = shooterVelocitySupplier.getAsDouble();
+            double hoodPosition = hoodPositionSupplier.getAsDouble();
 
-    public void updateTargetState() {
-        targetManager.updateTargetState(
-                robotLocalization.getActiveZones(),
-                DriverStation.getAlliance().orElse(Alliance.Blue),
-                swerve.getState(),
-                swerve.getOperatorForwardDirection());
-        SmartDashboard.putString("Targeting State", targetManager.getTargetingState().toString());
-    }
+            shooter.setMotorVelocity(shooterVelocity);
+            hood.setMotorPosition(hoodPosition);
 
-    private Command driveTest(double targetVelocityX, double targetVelocityY, double duration, int steps) {
-        SequentialCommandGroup sequence = new SequentialCommandGroup();
-        SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-
-        double stepVelocityX = targetVelocityX / steps;
-        double stepVelocityY = targetVelocityY / steps;
-        double stepDuration = duration / steps;
-
-        for (int i = 1; i <= steps; i++) {
-            final double currentX = stepVelocityX * i;
-            final double currentY = stepVelocityY * i;
-
-            sequence.addCommands(
-                    swerve.applyRequest(() -> drive
-                            .withVelocityX(currentX)
-                            .withVelocityY(currentY)
-                            .withRotationalRate(0))
-                            .withTimeout(stepDuration));
-        }
-
-        sequence.addCommands(
-                swerve.applyRequest(() -> drive
-                        .withVelocityX(0)
-                        .withVelocityY(0)
-                        .withRotationalRate(0))
-                        .withTimeout(2));
-
-        return sequence;
-    }
-
-    private Command rotateTest(double targetRotationRate, double duration, int steps) {
-        SequentialCommandGroup sequence = new SequentialCommandGroup();
-        SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-
-        double stepRotationalRate = targetRotationRate / steps;
-        double stepDuration = duration / steps;
-
-        for (int i = 1; i <= steps; i++) {
-            final double currentRate = stepRotationalRate * i;
-
-            sequence.addCommands(
-                    swerve.applyRequest(() -> drive
-                            .withVelocityX(0)
-                            .withVelocityY(0)
-                            .withRotationalRate(currentRate))
-                            .withTimeout(stepDuration));
-        }
-
-        sequence.addCommands(
-                swerve.applyRequest(() -> drive
-                        .withVelocityX(0)
-                        .withVelocityY(0)
-                        .withRotationalRate(0))
-                        .withTimeout(2));
-
-        return sequence;
-    }
-
-    private Command pointWheelsTest(double targetVelocity, double duration, int steps, boolean clockwise) {
-        SequentialCommandGroup sequence = new SequentialCommandGroup();
-        SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-
-        double stepAngle = (2 * Math.PI) / steps;
-        double stepDuration = duration / steps;
-
-        if (clockwise) {
-            stepAngle = -stepAngle;
-        }
-
-        for (int index = 0; index < steps; index++) {
-            double theta = index * stepAngle;
-            double x = Math.cos(theta);
-            double y = Math.sin(theta);
-            double magnitude = Math.hypot(x, y);
-
-            final double velocityX;
-            final double velocityY;
-
-            if (magnitude > 0) {
-                velocityX = (x / magnitude) * targetVelocity;
-                velocityY = (y / magnitude) * targetVelocity;
+            if (shooter.isMotorAtVelocity(shooterVelocity) && hood.isMotorAtPosition(hoodPosition)) {
+                loader.setMotorVelocity(LoaderVelocity.LOAD.rotationsPerSecond);
+                indexer.setMotorVelocity(IndexerVelocity.LOAD.rotationsPerSecond);
             } else {
-                velocityX = 0;
-                velocityY = 0;
+                loader.stopMotor();
+                indexer.stopMotor();
             }
-
-            sequence.addCommands(
-                    swerve.applyRequest(() -> drive
-                            .withVelocityX(velocityX)
-                            .withVelocityY(velocityY)
-                            .withRotationalRate(0))
-                            .withTimeout(stepDuration));
-        }
-
-        sequence.addCommands(
-                swerve.applyRequest(() -> drive
-                        .withVelocityX(0)
-                        .withVelocityY(0)
-                        .withRotationalRate(0))
-                        .withTimeout(2));
-
-        return sequence;
+        }, shooter, loader, indexer);
     }
 
-    public Command driveProveOut() {
-        final double targetTestVelocity = 2.5;
-        final double targetTestRotationRate = RotationsPerSecond.of(0.375).in(RadiansPerSecond);
+    public Command cmdFireFuel(ShooterVelocity shooterVelocity, HoodPosition hoodPosition) {
+        return Commands.parallel(
+                shooter.cmdSetMotorVelocity(shooterVelocity),
+                hood.cmdSetMotorPosition(hoodPosition))
+                .andThen(
+                        Commands.run(() -> {
+                            if (shooter.isMotorAtVelocity(shooterVelocity.rotationsPerSecond)
+                                    && hood.isMotorAtPosition(hoodPosition.rotations)) {
+                                loader.setMotorVelocity(LoaderVelocity.LOAD.rotationsPerSecond);
+                                indexer.setMotorVelocity(IndexerVelocity.LOAD.rotationsPerSecond);
+                            } else {
+                                loader.stopMotor();
+                                indexer.stopMotor();
+                            }
+                        }, shooter, loader, indexer));
 
-        final int driveTestSteps = 3;
-        final double driveTestDuration = 5;
+    }
 
-        final int rotateTestSteps = 3;
-        final double rotateTestDuration = 5;
+    public Command cmdStopFireFuel() {
+        return Commands.run(() -> {
+            shooter.setMotorVelocity(ShooterVelocity.WARM.rotationsPerSecond);
+            loader.stopMotor();
+            indexer.stopMotor();
+        }, shooter, loader, indexer);
+    }
 
-        final int pointWheelsTestSteps = 10;
-        final double pointWheelsTestDuration = 5;
-
+    public Command cmdCollectFuel() {
         return Commands.sequence(
-                driveTest(targetTestVelocity, 0, driveTestDuration, driveTestSteps),
-                driveTest(-targetTestVelocity, 0, driveTestDuration, driveTestSteps),
-                driveTest(0, targetTestVelocity, driveTestDuration, driveTestSteps),
-                driveTest(0, -targetTestVelocity, driveTestDuration, driveTestSteps),
-                rotateTest(targetTestRotationRate, rotateTestDuration, rotateTestSteps),
-                rotateTest(-targetTestRotationRate, rotateTestDuration, rotateTestSteps),
-                pointWheelsTest(targetTestVelocity, pointWheelsTestDuration, pointWheelsTestSteps, false),
-                pointWheelsTest(targetTestVelocity, pointWheelsTestDuration, pointWheelsTestSteps, true));
+                hopper.cmdSetMotorPosition(HopperPosition.DEPLOYED),
+                intake.cmdSetMotorVelocity(IntakeVelocity.COLLECT));
     }
 
-    public Command cmdColorControl(RGBWColor newColor) {
-        return Commands.run(() -> systemLights.setColor(newColor), systemLights);
-    }
-
-    public Command cmdAnimationControl() {
-        return Commands.run(() -> systemLights.setAnimation(Animation.RAINBOW), systemLights);
-    }
-
-    public Command proveOut() {
+    public Command cmdStopCollectFuel() {
         return Commands.sequence(
-                driveProveOut());
+                intake.cmdStopMotor(),
+                hopper.cmdSetMotorPosition(HopperPosition.HOME));
     }
 }

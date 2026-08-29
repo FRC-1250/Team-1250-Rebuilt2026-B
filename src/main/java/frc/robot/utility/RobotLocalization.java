@@ -15,7 +15,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Limelight.LimelightLocalizationMode;
 import frc.robot.utility.LimelightHelpers.PoseEstimate;
@@ -23,7 +23,7 @@ import frc.robot.utility.LimelightHelpers.RawFiducial;
 
 public class RobotLocalization {
     private final List<Limelight> limelights;
-    private final CommandSwerveDrivetrain swerveDrivetrain;
+    private final Swerve swerveDrivetrain;
 
     private double tagAmbiguous = 0;
     private double tagTooSmall = 0;
@@ -47,7 +47,7 @@ public class RobotLocalization {
     private List<FieldLocalization.Zones> activeZones = new ArrayList<>();
 
     /** Creates a new SwerveVisionLogic. */
-    public RobotLocalization(List<Limelight> limelights, CommandSwerveDrivetrain swerveDrivetrain) {
+    public RobotLocalization(List<Limelight> limelights, Swerve swerveDrivetrain) {
         this.limelights = limelights;
         this.swerveDrivetrain = swerveDrivetrain;
         reportTimer.start();

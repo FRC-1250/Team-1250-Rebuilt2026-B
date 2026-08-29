@@ -8,33 +8,34 @@ import java.util.List;
 import java.util.Optional;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Limelight.LimelightLocalizationMode;
 import frc.robot.subsystems.Loader;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.Limelight.LimelightLocalizationMode;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.Swerve;
 import frc.robot.utility.HubTracker;
-import frc.robot.utility.RumbleProfile;
-import frc.robot.utility.RumbleStep;
 import frc.robot.utility.HubTracker.Shift;
+import frc.robot.utility.RobotLocalization;
+import frc.robot.utility.TargetManager;
 
 public class RobotContainer {
-
-    private final CommandSwerveDrivetrain swerve = TunerConstants.createDrivetrain();
+    private final Swerve swerve = TunerConstants.createDrivetrain();
     private final Limelight limelight = new Limelight("limelight", LimelightLocalizationMode.ENABLED);
-    private final LED systemLights = new LED();
 
     @Logged(name = "Shooter")
     private final Shooter shooter = new Shooter();
@@ -54,12 +55,10 @@ public class RobotContainer {
     @Logged(name = "Hopper")
     private final Hopper hopper = new Hopper();
 
-    private final CommandFactory commandFactory = new CommandFactory(
-            swerve,
-            List.of(limelight),
-            systemLights);
+    private final TargetManager targetManager = new TargetManager();
+    private final RobotLocalization robotLocalization = new RobotLocalization(List.of(limelight), swerve);
 
-    private final CommandXboxController LightButtons = new CommandXboxController(0);
+    private final CommandXboxController primaryDriver = new CommandXboxController(0);
 
     private final double SHIFT_CLOCK_WARNING = 8.0;
     private final double SHIFT_CLOCK_PRE_FIRE = 2.0;
@@ -85,6 +84,7 @@ public class RobotContainer {
             () -> HubTracker.isActive());
 
     public RobotContainer() {
+        configureRumbleProfiles();
         configureBindings();
     }
 
@@ -116,15 +116,28 @@ public class RobotContainer {
         return Commands.print("No autonomous command configured");
     }
 
-    private void configureBindings() {
-        LightButtons.a().whileTrue(commandFactory.cmdColorControl(LED.kGreen));
-        LightButtons.b().whileTrue(commandFactory.cmdColorControl(LED.kRed));
-        LightButtons.x().whileTrue(commandFactory.cmdColorControl(LED.kBlue));
-        LightButtons.y().whileTrue(commandFactory.cmdColorControl(LED.kYellow));
-        LightButtons.rightTrigger().whileTrue(commandFactory.cmdAnimationControl());
-        hubActiveSoon.onTrue(Commands.run(() -> LightButtons.setRumble(RumbleType.kBothRumble, 0.5)));
+    public void updateTargetState() {
+        targetManager.updateTargetState(
+                robotLocalization.getActiveZones(),
+                DriverStation.getAlliance().orElse(Alliance.Blue),
+                swerve.getState(),
+                swerve.getOperatorForwardDirection());
+        SmartDashboard.putString("Targeting State", targetManager.getTargetingState().toString());
+    }
 
-        RumbleProfile pulse = new RumbleProfile();
-        pulse.addStep(new RumbleStep(RumbleType.kBothRumble, 1.0, 0.25));
+    private void configureBindings() {
+
+    }
+
+    private void configureRumbleProfiles() {
+
+    }
+
+    private Rotation2d getRotationToTargetBasedOnZone() {
+        return targetManager.getTargetingState().rotation();
+    }
+
+    private double getVelocityBasedOnTargetDistance() {
+        return shooter.getInterpolatedVelocity(targetManager.getTargetingState().distance());
     }
 }
