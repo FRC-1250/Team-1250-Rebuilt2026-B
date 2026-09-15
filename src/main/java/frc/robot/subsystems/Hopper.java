@@ -41,8 +41,8 @@ public class Hopper extends SubsystemBase {
 
     }
 
-    private final TalonFX hopperMotor = new TalonFX(30);
-    private final DigitalInput hopperHomeSensor = new DigitalInput(1);
+    private final TalonFX motor = new TalonFX(30);
+    private final DigitalInput homeMagSensor = new DigitalInput(1);
     private final PositionVoltage positionControl = new PositionVoltage(0).withSlot(0);
     private final double CLOSED_LOOP_TOLERANCE = 0.0;
 
@@ -87,25 +87,25 @@ public class Hopper extends SubsystemBase {
         talonFXConfiguration.SoftwareLimitSwitch = softwareLimitSwitchConfigs;
         talonFXConfiguration.MotionMagic = motionMagicConfigs;
 
-        hopperMotor.getConfigurator().apply(talonFXConfiguration);
-        hopperMotor.setPosition(0);
-        hopperMotor.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        motor.getConfigurator().apply(talonFXConfiguration);
+        motor.setPosition(0);
+        motor.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
     }
 
     public void setMotorPosition(double rotations) {
-        hopperMotor.setControl(positionControl.withPosition(rotations));
+        motor.setControl(positionControl.withPosition(rotations));
     }
 
     public void setPosition(double rotations) {
-        hopperMotor.setPosition(rotations);
+        motor.setPosition(rotations);
     }
 
     public void stopMotor() {
-        hopperMotor.stopMotor();
+        motor.stopMotor();
     }
 
     public boolean isMotorAtPosition(double rotations) {
-        return hopperMotor.getPosition().isNear(rotations, CLOSED_LOOP_TOLERANCE);
+        return motor.getPosition().isNear(rotations, CLOSED_LOOP_TOLERANCE);
     }
 
     public Command cmdSetMotorPosition(double rotations) {
@@ -128,7 +128,7 @@ public class Hopper extends SubsystemBase {
 
     public Command cmdResetMotorPositionWithSensor() {
         return Commands.sequence(
-                Commands.runOnce(() -> hopperMotor.set(-0.2), this),
+                Commands.runOnce(() -> motor.set(-0.2), this),
                 Commands.waitUntil(() -> getSensorState()),
                 Commands.runOnce(() -> setPosition(HopperPosition.REVERSE_LIMIT.rotations)),
                 Commands.runOnce(() -> setMotorPosition(HopperPosition.HOME.rotations)));
@@ -136,21 +136,21 @@ public class Hopper extends SubsystemBase {
 
     @Logged(name = "Sensor state")
     public boolean getSensorState() {
-        return hopperHomeSensor.get();
+        return homeMagSensor.get();
     }
 
     @Logged(name = "Motor Position")
     public double getMotorPosition() {
-        return hopperMotor.getPosition().getValueAsDouble();
+        return motor.getPosition().getValueAsDouble();
     }
 
     @Logged(name = "Motor Stator current")
     public double getMotorStatorCurrent() {
-        return hopperMotor.getStatorCurrent().getValueAsDouble();
+        return motor.getStatorCurrent().getValueAsDouble();
     }
 
     @Logged(name = "Motor Supply current")
     public double getMotorSupplyCurrent() {
-        return hopperMotor.getSupplyCurrent().getValueAsDouble();
+        return motor.getSupplyCurrent().getValueAsDouble();
     }
 }
