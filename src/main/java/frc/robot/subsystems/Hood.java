@@ -37,8 +37,8 @@ public class Hood extends SubsystemBase {
         }
     }
 
-    private final TalonFX hoodMotor = new TalonFX(35);
-    private final CANcoder hoodEncoder = new CANcoder(36);
+    private final TalonFX motor = new TalonFX(35);
+    private final CANcoder cancoder = new CANcoder(36);
     private final PositionVoltage positionControl = new PositionVoltage(0).withSlot(0);
     private final double MAGNET_OFFSET = 0.2;
     private final double CLOSED_LOOP_TOLERANCE = 0.5;
@@ -56,36 +56,36 @@ public class Hood extends SubsystemBase {
                 .withKP(8)
                 .withKI(0)
                 .withKD(0.01);
-        talonFXConfiguration.Feedback.FeedbackRemoteSensorID = hoodEncoder.getDeviceID();
+        talonFXConfiguration.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
         talonFXConfiguration.Slot0 = positionGains;
         talonFXConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
         talonFXConfiguration.Feedback.RotorToSensorRatio = 34.7826;
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
 
-        hoodMotor.getConfigurator().apply(talonFXConfiguration);
-        hoodMotor.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        hoodMotor.getRotorPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        motor.getConfigurator().apply(talonFXConfiguration);
+        motor.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        motor.getRotorPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
 
         CANcoderConfiguration canCoderConfiguration = new CANcoderConfiguration();
         canCoderConfiguration.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
         canCoderConfiguration.MagnetSensor.MagnetOffset = MAGNET_OFFSET;
         canCoderConfiguration.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 
-        hoodEncoder.getConfigurator().apply(canCoderConfiguration);
-        hoodEncoder.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        hoodEncoder.getAbsolutePosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        cancoder.getConfigurator().apply(canCoderConfiguration);
+        cancoder.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        cancoder.getAbsolutePosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
     }
 
     public void setMotorPosition(double rotations) {
-        hoodMotor.setControl(positionControl.withPosition(rotations));
+        motor.setControl(positionControl.withPosition(rotations));
     }
 
     public void stopMotor() {
-        hoodMotor.stopMotor();
+        motor.stopMotor();
     }
 
     public boolean isMotorAtPosition(double rotations) {
-        return hoodEncoder.getAbsolutePosition().isNear(rotations, CLOSED_LOOP_TOLERANCE);
+        return cancoder.getAbsolutePosition().isNear(rotations, CLOSED_LOOP_TOLERANCE);
     }
 
     public Command cmdSetMotorPosition(double rotations) {
@@ -102,21 +102,21 @@ public class Hood extends SubsystemBase {
 
     @Logged(name = "Encoder Abs Position")
     public double getEncoderAbsolutePosition() {
-        return hoodEncoder.getAbsolutePosition().getValueAsDouble();
+        return cancoder.getAbsolutePosition().getValueAsDouble();
     }
 
     @Logged(name = "Motor Position")
     public double getMotorPosition() {
-        return hoodMotor.getPosition().getValueAsDouble();
+        return motor.getPosition().getValueAsDouble();
     }
 
     @Logged(name = "Motor Stator Current")
     public double getMotorStatorCurrent() {
-        return hoodMotor.getStatorCurrent().getValueAsDouble();
+        return motor.getStatorCurrent().getValueAsDouble();
     }
 
     @Logged(name = "Motor Supply Current")
     public double getMotorSupplyCurrent() {
-        return hoodMotor.getSupplyCurrent().getValueAsDouble();
+        return motor.getSupplyCurrent().getValueAsDouble();
     }
 }
