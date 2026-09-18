@@ -18,7 +18,7 @@ public class FieldLocalization {
         }
     }
 
-    public enum Zones {
+    public enum Zone {
         BLUE_DEPOT_RED_OUTPOST_NEUTRAL_ZONE(
                 new FieldZoneRectangle(
                         11.8618,
@@ -49,7 +49,7 @@ public class FieldLocalization {
 
         public final FieldZone area;
 
-        Zones(FieldZone area) {
+        Zone(FieldZone area) {
             this.area = area;
         }
     }

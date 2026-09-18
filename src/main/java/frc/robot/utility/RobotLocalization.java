@@ -44,7 +44,7 @@ public class RobotLocalization {
     private final double fieldWidth = Units.feetToMeters(27);
 
     private final Timer reportTimer = new Timer();
-    private List<FieldLocalization.Zones> activeZones = new ArrayList<>();
+    private List<FieldLocalization.Zone> activeZones = new ArrayList<>();
 
     /** Creates a new SwerveVisionLogic. */
     public RobotLocalization(List<Limelight> limelights, Swerve swerveDrivetrain) {
@@ -178,14 +178,14 @@ public class RobotLocalization {
     public void processActiveZone() {
         Pose2d robotPose = swerveDrivetrain.getState().Pose;
 
-        activeZones = Arrays.stream(FieldLocalization.Zones.values())
+        activeZones = Arrays.stream(FieldLocalization.Zone.values())
                 .filter(z -> z.area.isRobotInZone(robotPose))
                 .toList();
 
         SmartDashboard.putString("Zones", activeZones.toString());
     }
 
-    public List<FieldLocalization.Zones> getActiveZones() {
+    public List<FieldLocalization.Zone> getActiveZones() {
         return activeZones;
     }
 }

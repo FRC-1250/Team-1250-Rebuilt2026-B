@@ -14,7 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.utility.FieldLocalization.Landmark;
-import frc.robot.utility.FieldLocalization.Zones;
+import frc.robot.utility.FieldLocalization.Zone;
 
 public class TargetManager {
 
@@ -26,26 +26,26 @@ public class TargetManager {
 
     private TargetingState activeState;
 
-    private final Map<Alliance, Map<Zones, PrioritizedLandmark>> strategy = new EnumMap<>(Alliance.class);
+    private final Map<Alliance, Map<Zone, PrioritizedLandmark>> strategy = new EnumMap<>(Alliance.class);
 
     public TargetManager() {
 
-        strategy.put(Alliance.Blue, new EnumMap<>(Zones.class));
-        strategy.put(Alliance.Red, new EnumMap<>(Zones.class));
+        strategy.put(Alliance.Blue, new EnumMap<>(Zone.class));
+        strategy.put(Alliance.Red, new EnumMap<>(Zone.class));
 
         var blue = strategy.get(Alliance.Blue);
-        blue.put(Zones.BLUE_ALLIANCE_ZONE, new PrioritizedLandmark(Landmark.BLUE_HUB, 10));
-        blue.put(Zones.BLUE_DEPOT_RED_OUTPOST_NEUTRAL_ZONE, new PrioritizedLandmark(Landmark.BLUE_DEPOT, 20));
-        blue.put(Zones.BLUE_OUTPOST_RED_DEPOT_NEUTRAL_ZONE, new PrioritizedLandmark(Landmark.BLUE_OUTPOST, 20));
+        blue.put(Zone.BLUE_ALLIANCE_ZONE, new PrioritizedLandmark(Landmark.BLUE_HUB, 10));
+        blue.put(Zone.BLUE_DEPOT_RED_OUTPOST_NEUTRAL_ZONE, new PrioritizedLandmark(Landmark.BLUE_DEPOT, 20));
+        blue.put(Zone.BLUE_OUTPOST_RED_DEPOT_NEUTRAL_ZONE, new PrioritizedLandmark(Landmark.BLUE_OUTPOST, 20));
 
         var red = strategy.get(Alliance.Red);
-        red.put(Zones.RED_ALLIANCE_ZONE, new PrioritizedLandmark(Landmark.RED_HUB, 10));
-        red.put(Zones.BLUE_DEPOT_RED_OUTPOST_NEUTRAL_ZONE, new PrioritizedLandmark(Landmark.RED_OUTPOST, 20));
-        red.put(Zones.BLUE_OUTPOST_RED_DEPOT_NEUTRAL_ZONE, new PrioritizedLandmark(Landmark.RED_DEPOT, 20));
+        red.put(Zone.RED_ALLIANCE_ZONE, new PrioritizedLandmark(Landmark.RED_HUB, 10));
+        red.put(Zone.BLUE_DEPOT_RED_OUTPOST_NEUTRAL_ZONE, new PrioritizedLandmark(Landmark.RED_OUTPOST, 20));
+        red.put(Zone.BLUE_OUTPOST_RED_DEPOT_NEUTRAL_ZONE, new PrioritizedLandmark(Landmark.RED_DEPOT, 20));
     }
 
     public void updateTargetState(
-            List<Zones> activeZones,
+            List<Zone> activeZones,
             Alliance alliance,
             SwerveDriveState swerveDriveState,
             Rotation2d operatorForwardDirection) {
@@ -93,8 +93,8 @@ public class TargetManager {
                 .plus(operatorForwardDirection);
     }
 
-    private Optional<Translation2d> getTarget(List<Zones> activeZones, Alliance alliance) {
-        Map<Zones, PrioritizedLandmark> playbook = strategy.get(alliance);
+    private Optional<Translation2d> getTarget(List<Zone> activeZones, Alliance alliance) {
+        Map<Zone, PrioritizedLandmark> playbook = strategy.get(alliance);
 
         if (playbook == null) {
             return Optional.empty();
