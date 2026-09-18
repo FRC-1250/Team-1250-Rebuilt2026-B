@@ -2,13 +2,8 @@ package frc.robot;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Indexer;
@@ -21,7 +16,6 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Hood.HoodPosition;
 import frc.robot.subsystems.Hopper.HopperPosition;
 import frc.robot.subsystems.Shooter.ShooterVelocity;
-import frc.robot.utility.TargetManager;
 
 public class CommandFactory {
     private final Hood hood;
@@ -44,10 +38,6 @@ public class CommandFactory {
         this.intake = intake;
         this.loader = loader;
         this.shooter = shooter;
-    }
-
-    public Rotation2d getRotationToTargetBasedOnZone() {
-        return targetManager.getTargetingState().rotation();
     }
 
     public Command cmdFireFuel(DoubleSupplier shooterVelocitySupplier, DoubleSupplier hoodPositionSupplier) {
