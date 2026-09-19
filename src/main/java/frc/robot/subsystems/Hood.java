@@ -31,9 +31,11 @@ public class Hood extends SubsystemBase {
         FORWARD_LIMIT(0.0);
 
         public double rotations;
+        public double angle;
 
         private HoodPosition(double rotations) {
             this.rotations = rotations;
+            this.angle = rotations; // TODO: Find math function for this
         }
     }
 

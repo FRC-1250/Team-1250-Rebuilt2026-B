@@ -17,8 +17,6 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -44,27 +42,12 @@ public class Shooter extends SubsystemBase {
     private final TalonFX leftMotor = new TalonFX(1);
     private final TalonFX upperRightMotor = new TalonFX(2);
     private final TalonFX lowerRightMotor = new TalonFX(3);
-    private final InterpolatingDoubleTreeMap velocityLookUpTable = new InterpolatingDoubleTreeMap();
     private final Follower followerControl = new Follower(leftMotor.getDeviceID(), MotorAlignmentValue.Opposed);
     private final VelocityVoltage velocityControl = new VelocityVoltage(0).withSlot(0);
     private final double CLOSED_LOOP_TOLERANCE = 5;
 
     public Shooter() {
         configureShooter();
-        configureVelocityMap();
-    }
-
-    public double getInterpolatedVelocity(double distance) {
-        // get handles interpolation for you
-        return velocityLookUpTable.get(distance);
-    }
-
-    public double getTargetVelocity(double distance) {
-        // (meters, rps)
-        // y = 15.36x (0,0) to (3.125, 48)
-        // y = 56x - 127 (3.125, 48) to (3.25, 55)
-        return Math.max(Math.min(15.36 * distance, ShooterVelocity.MAX.rotationsPerSecond),
-                ShooterVelocity.MIN.rotationsPerSecond);
     }
 
     public void setMotorVelocity(double rotationsPerSecond) {
@@ -134,26 +117,6 @@ public class Shooter extends SubsystemBase {
     @Logged(name = "Lower Right motor Supply Current")
     public double getLowerRightMotorSupplyCurrent() {
         return lowerRightMotor.getSupplyCurrent().getValueAsDouble();
-    }
-
-    private void configureVelocityMap() {
-        /*
-         * In code we assume center to center for distance!
-         * 
-         * Assuming the below input LUT values are measured from front of hub to front
-         * of robot bumper, the offset should be added to each value to account for the
-         * missing distance.
-         * 
-         */
-        final var hubFrontToCenterOffsetMeters = 0.591;
-        final var robotFrontToCenterOffsetMeters = 0.724 / 2; // with bumpers
-        final var offset = hubFrontToCenterOffsetMeters + robotFrontToCenterOffsetMeters;
-
-        velocityLookUpTable.put(Units.feetToMeters(4) + offset, 40.0);
-        velocityLookUpTable.put(Units.feetToMeters(6) + offset, 45.0);
-        velocityLookUpTable.put(Units.feetToMeters(8) + offset, 48.0);
-        velocityLookUpTable.put(Units.feetToMeters(10) + offset, 53.0);
-        velocityLookUpTable.put(Units.feetToMeters(20) + offset, 70.0);
     }
 
     private void configureShooter() {

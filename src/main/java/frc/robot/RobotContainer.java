@@ -11,9 +11,13 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import java.util.List;
 import java.util.Optional;
 
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentric;
+import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentricFacingAngle;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -26,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Hood;
+import frc.robot.subsystems.Hood.HoodPosition;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -35,11 +40,10 @@ import frc.robot.subsystems.Loader;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterVelocity;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Hood.HoodPosition;
 import frc.robot.utility.HubTracker;
 import frc.robot.utility.HubTracker.Shift;
 import frc.robot.utility.RobotLocalization;
-import frc.robot.utility.TargetManager;
+import frc.robot.utility.ShooterStrategyManager;
 
 public class RobotContainer {
     private final Swerve swerve = TunerConstants.createDrivetrain();
@@ -73,7 +77,7 @@ public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
-    private final TargetManager targetManager = new TargetManager();
+    private final ShooterStrategyManager targetManager = new ShooterStrategyManager();
     private final RobotLocalization robotLocalization = new RobotLocalization(List.of(limelight), swerve);
 
     private final CommandXboxController primary = new CommandXboxController(0);
@@ -102,6 +106,16 @@ public class RobotContainer {
             () -> HubTracker.isActive());
 
     private Trigger robotIsAligned;
+
+    private final FieldCentric drive = new SwerveRequest.FieldCentric()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+    private final FieldCentricFacingAngle driveWithAngle = new FieldCentricFacingAngle()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+    private final EventLoop singlePlayer = new EventLoop();
 
     public RobotContainer() {
         configureRumbleProfiles();
@@ -159,23 +173,16 @@ public class RobotContainer {
     }
 
     private Rotation2d getRotationToTargetBasedOnZone() {
-        return targetManager.getTargetingState().rotation();
+        return targetManager.getTargetingState().targetAngle();
     }
 
     private double getVelocityBasedOnTargetDistance() {
-        return shooter.getInterpolatedVelocity(targetManager.getTargetingState().distance());
+        return targetManager.getTargetingState().shooterVelocity();
     }
 
-    // *Bindings*
-
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-
-    private final SwerveRequest.FieldCentricFacingAngle driveWithAngle = new FieldCentricFacingAngle()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-    private final EventLoop singlePlayer = new EventLoop();
+    private HoodPosition getHoodPositionBasedOnZone() {
+        return targetManager.getTargetingState().hoodPosition();
+    }
 
     private void configureSinglePlayerBindings() {
         configureCommonBindings(singlePlayer);
@@ -188,7 +195,7 @@ public class RobotContainer {
         primary.rightTrigger(0.5, singlePlayer).and(primary.leftTrigger(0.5, singlePlayer)).and(robotIsAligned)
                 .whileTrue(commandFactory.cmdFireFuel(
                         () -> getVelocityBasedOnTargetDistance(),
-                        () -> HoodPosition.ALLIANCE_ZONE.rotations) // TODO: Change this to something more meaningful
+                        () -> getHoodPositionBasedOnZone().rotations)
                         .withName("Fire by distance")); // Shoot
 
         primary.rightTrigger(0.5, singlePlayer).and(primary.leftTrigger(0.5, singlePlayer).negate())
@@ -202,7 +209,7 @@ public class RobotContainer {
                                 .withVelocityX(yLimiter.calculate(-primary.getLeftY() * (MaxSpeed * 0.5)))
                                 .withVelocityY(xLimiter.calculate(-primary.getLeftX() * (MaxSpeed * 0.5)))
                                 .withHeadingPID(15, 0, 0)
-                                .withTargetDirection(commandFactory.getRotationToTargetBasedOnZone()))
+                                .withTargetDirection(getRotationToTargetBasedOnZone()))
                         .withName("Point centric swerve"));
 
         primary.b(singlePlayer).whileTrue(
