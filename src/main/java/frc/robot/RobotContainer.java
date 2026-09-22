@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentric;
 import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentricFacingAngle;
 
@@ -30,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Hood;
-import frc.robot.subsystems.Hood.HoodPosition;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -40,6 +38,7 @@ import frc.robot.subsystems.Loader;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterVelocity;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Hood.HoodPosition;
 import frc.robot.utility.HubTracker;
 import frc.robot.utility.HubTracker.Shift;
 import frc.robot.utility.RobotLocalization;
@@ -81,6 +80,8 @@ public class RobotContainer {
     private final RobotLocalization robotLocalization = new RobotLocalization(List.of(limelight), swerve);
 
     private final CommandXboxController primary = new CommandXboxController(0);
+    private final SlewRateLimiter xLimiter = new SlewRateLimiter(20, -20, 0);
+    private final SlewRateLimiter yLimiter = new SlewRateLimiter(20, -20, 0);
 
     private final double SHIFT_CLOCK_WARNING = 8.0;
     private final double SHIFT_CLOCK_PRE_FIRE = 2.0;
@@ -107,19 +108,9 @@ public class RobotContainer {
 
     private Trigger robotIsAligned;
 
-    private final FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-
-    private final FieldCentricFacingAngle driveWithAngle = new FieldCentricFacingAngle()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-
-    private final EventLoop singlePlayer = new EventLoop();
-
     public RobotContainer() {
         configureRumbleProfiles();
-        configureBindings();
+        configureSinglePlayerBindings();
     }
 
     public Shift getShift() {
@@ -164,10 +155,6 @@ public class RobotContainer {
         robotLocalization.processActiveZone();
     }
 
-    private void configureBindings() {
-
-    }
-
     private void configureRumbleProfiles() {
 
     }
@@ -183,6 +170,16 @@ public class RobotContainer {
     private HoodPosition getHoodPositionBasedOnZone() {
         return targetManager.getTargetingState().hoodPosition();
     }
+    // *Bindings*
+
+    private final FieldCentric drive = new FieldCentric()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+    private final FieldCentricFacingAngle driveWithAngle = new FieldCentricFacingAngle()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    private final EventLoop singlePlayer = new EventLoop();
 
     private void configureSinglePlayerBindings() {
         configureCommonBindings(singlePlayer);
@@ -217,7 +214,7 @@ public class RobotContainer {
                         () -> driveWithAngle
                                 .withVelocityX(yLimiter.calculate(-primary.getLeftY() * (MaxSpeed * 0.33)))
                                 .withVelocityY(xLimiter.calculate(-primary.getLeftX() * (MaxSpeed * 0.33)))
-                                .withHeadingPID(15, 0, 0)
+                                .withHeadingPID(0, 0, 0)
                                 .withTargetDirection(Rotation2d.k180deg))
                         .withName("Snap backwards"));
 
@@ -234,9 +231,6 @@ public class RobotContainer {
                 .onTrue(commandFactory.cmdCollectFuel().withName("Activate fuel pick up")); // Intake out
         primary.leftBumper(singlePlayer)
                 .onTrue(commandFactory.cmdStopCollectFuel().withName("Deactivate fuel pick up")); // Intake in
-
-        primary.pov(0, 0, singlePlayer).onTrue(Commands.none()); // Climb
-        primary.pov(0, 180, singlePlayer).onTrue(Commands.none()); // Unclim
     }
 
     private void configureCommonBindings(EventLoop loop) {
