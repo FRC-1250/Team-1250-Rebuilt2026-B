@@ -195,6 +195,9 @@ public class RobotContainer {
                         () -> getHoodPositionBasedOnZone().rotations)
                         .withName("Fire by distance")); // Shoot
 
+        primary.rightTrigger(0.5, singlePlayer).negate().and(primary.leftTrigger(0.5, singlePlayer).negate())
+                .whileTrue(hood.cmdSetMotorPosition(HoodPosition.HOME));
+
         primary.rightTrigger(0.5, singlePlayer).and(primary.leftTrigger(0.5, singlePlayer).negate())
                 .whileTrue(commandFactory
                         .cmdFireFuel(ShooterVelocity.TOWER, HoodPosition.ALLIANCE_ZONE)

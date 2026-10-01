@@ -4,6 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Indexer;
@@ -16,6 +17,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Hood.HoodPosition;
 import frc.robot.subsystems.Hopper.HopperPosition;
 import frc.robot.subsystems.Shooter.ShooterVelocity;
+import frc.robot.utility.HubTracker;
 
 public class CommandFactory {
     private final Hood hood;
