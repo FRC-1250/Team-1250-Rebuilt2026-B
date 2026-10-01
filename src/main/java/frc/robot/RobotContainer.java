@@ -203,6 +203,9 @@ public class RobotContainer {
                         ShooterVelocity.TOWER,
                         HoodPosition.ALLIANCE_ZONE)
                         .withName("Shoot default"));
+                        
+        primary.rightTrigger().negate().and(primary.leftTrigger().negate())
+                .whileTrue(hood.cmdSetMotorPosition(HoodPosition.HOME));
 
         primary.leftTrigger().whileTrue(
                 swerve.applyRequest(

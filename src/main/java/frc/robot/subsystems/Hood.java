@@ -121,4 +121,5 @@ public class Hood extends SubsystemBase {
     public double getMotorSupplyCurrent() {
         return motor.getSupplyCurrent().getValueAsDouble();
     }
+
 }
