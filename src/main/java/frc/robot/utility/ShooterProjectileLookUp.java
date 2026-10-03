@@ -15,20 +15,21 @@ public class ShooterProjectileLookUp {
     public static final Map<HoodPosition, InterpolatingDoubleTreeMap> hoodPositionLookUpTableMap = new EnumMap<>(
             HoodPosition.class);
 
-    /*
-     * All measurements below should be done center to center.
-     */
     static {
-        add(HoodPosition.ALLIANCE_ZONE, 4, 40);
-        add(Hoodposition.ALLIANCE_ZONE,  2, 40);
-        add(HoodPosition.ALLIANCE_ZONE, 5, 40);
+        add(HoodPosition.ALLIANCE_ZONE, Units.feetToMeters(4), 40);
+        add(HoodPosition.ALLIANCE_ZONE, Units.feetToMeters(6), 40);
+        add(HoodPosition.ALLIANCE_ZONE, Units.feetToMeters(8), 40);
+        add(HoodPosition.ALLIANCE_ZONE, Units.feetToMeters(10), 40);
 
-        add(HoodPosition.NEUTRAL_ZONE, 9, 40);
-        add(HoodPosition.NEUTRAL_ZONE, 9, 40);
+        add(HoodPosition.NEUTRAL_ZONE, Units.feetToMeters(4), 40);
+        add(HoodPosition.NEUTRAL_ZONE, Units.feetToMeters(6), 40);
+        add(HoodPosition.NEUTRAL_ZONE, Units.feetToMeters(8), 40);
+        add(HoodPosition.NEUTRAL_ZONE, Units.feetToMeters(10), 40);
 
-        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, 4, 40);
-        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, 2, 40);
-        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, 5, 40);
+        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, Units.feetToMeters(4), 40);
+        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, Units.feetToMeters(6), 40);
+        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, Units.feetToMeters(8), 40);
+        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, Units.feetToMeters(10), 40);
     }
 
     private static void add(HoodPosition position, double distanceFromBumperMeters, double shooterVelocity) {
