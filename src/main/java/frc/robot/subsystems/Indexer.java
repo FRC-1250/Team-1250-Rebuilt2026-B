@@ -9,11 +9,9 @@ import static edu.wpi.first.units.Units.Hertz;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
@@ -34,9 +32,7 @@ public class Indexer extends SubsystemBase {
         }
     }
 
-    private final TalonFX leftMotor = new TalonFX(9);
-    private final TalonFX rightMotor = new TalonFX(10);
-    private final Follower followerControl = new Follower(leftMotor.getDeviceID(), MotorAlignmentValue.Opposed);
+    private final TalonFX motor = new TalonFX(9);
     private final VelocityVoltage velocityControl = new VelocityVoltage(0).withSlot(0);
     private final double CLOSED_LOOP_TOLERANCE = 5;
 
@@ -58,24 +54,20 @@ public class Indexer extends SubsystemBase {
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
 
-        leftMotor.getConfigurator().apply(talonFXConfiguration);
-        leftMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-
-        rightMotor.getConfigurator().apply(talonFXConfiguration);
-        rightMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        rightMotor.setControl(followerControl);
+        motor.getConfigurator().apply(talonFXConfiguration);
+        motor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
     }
 
     public void setMotorVelocity(double rotationsPerSecond) {
-        leftMotor.setControl(velocityControl.withVelocity(rotationsPerSecond));
+        motor.setControl(velocityControl.withVelocity(rotationsPerSecond));
     }
 
     public boolean isMotorAtVelocity(double rotationsPerSecond) {
-        return leftMotor.getVelocity().isNear(rotationsPerSecond, CLOSED_LOOP_TOLERANCE);
+        return motor.getVelocity().isNear(rotationsPerSecond, CLOSED_LOOP_TOLERANCE);
     }
 
     public void stopMotor() {
-        leftMotor.stopMotor();
+        motor.stopMotor();
     }
 
     public Command cmdSetMotorVelocity(double rotationsPerSecond) {
@@ -90,33 +82,18 @@ public class Indexer extends SubsystemBase {
         return Commands.runOnce(() -> stopMotor(), this);
     }
 
-    @Logged(name = "Left Motor Velocity")
+    @Logged(name = "Motor Velocity")
     public double getLeftMotorVelocity() {
-        return leftMotor.getVelocity().getValueAsDouble();
+        return motor.getVelocity().getValueAsDouble();
     }
 
-    @Logged(name = "Left Motor Stator Current")
+    @Logged(name = "Motor Stator Current")
     public double getLeftMotorStatorCurrent() {
-        return leftMotor.getStatorCurrent().getValueAsDouble();
+        return motor.getStatorCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Left Motor Supply Current")
+    @Logged(name = "Motor Supply Current")
     public double getLeftMotorSupplyCurrent() {
-        return leftMotor.getSupplyCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Right Motor Velocity")
-    public double getRightMotorVelocity() {
-        return rightMotor.getVelocity().getValueAsDouble();
-    }
-
-    @Logged(name = "Right Motor Stator Current")
-    public double getRightMotorStatorCurrent() {
-        return rightMotor.getStatorCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Right Motor Supply Current")
-    public double getRightMotorSupplyCurrent() {
-        return rightMotor.getSupplyCurrent().getValueAsDouble();
+        return motor.getSupplyCurrent().getValueAsDouble();
     }
 }
