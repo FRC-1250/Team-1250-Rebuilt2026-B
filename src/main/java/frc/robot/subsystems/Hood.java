@@ -61,7 +61,6 @@ public class Hood extends SubsystemBase {
         talonFXConfiguration.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
         talonFXConfiguration.Slot0 = positionGains;
         talonFXConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        talonFXConfiguration.Feedback.RotorToSensorRatio = 34.7826;
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
 
         motor.getConfigurator().apply(talonFXConfiguration);
