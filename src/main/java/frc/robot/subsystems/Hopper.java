@@ -41,7 +41,7 @@ public class Hopper extends SubsystemBase {
 
     }
 
-    private final TalonFX motor = new TalonFX(30);
+    private final TalonFX motor = new TalonFX(8);
     private final DigitalInput homeMagSensor = new DigitalInput(1);
     private final PositionVoltage positionControl = new PositionVoltage(0).withSlot(0);
     private final double CLOSED_LOOP_TOLERANCE = 0.0;

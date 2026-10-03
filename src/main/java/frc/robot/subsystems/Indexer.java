@@ -32,7 +32,7 @@ public class Indexer extends SubsystemBase {
         }
     }
 
-    private final TalonFX motor = new TalonFX(9);
+    private final TalonFX motor = new TalonFX(2);
     private final VelocityVoltage velocityControl = new VelocityVoltage(0).withSlot(0);
     private final double CLOSED_LOOP_TOLERANCE = 5;
 

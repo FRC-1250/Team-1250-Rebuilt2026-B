@@ -39,9 +39,9 @@ public class Shooter extends SubsystemBase {
         }
     }
 
-    private final TalonFX leftMotor = new TalonFX(1);
-    private final TalonFX rightMotor = new TalonFX(3);
-    private final Follower followerControl = new Follower(leftMotor.getDeviceID(), MotorAlignmentValue.Opposed);
+    private final TalonFX shooterFollower = new TalonFX(61);
+    private final TalonFX shooterLeader = new TalonFX(11);
+    private final Follower followerControl = new Follower(shooterFollower.getDeviceID(), MotorAlignmentValue.Opposed);
     private final VelocityVoltage velocityControl = new VelocityVoltage(0).withSlot(0);
     private final double CLOSED_LOOP_TOLERANCE = 5;
 
@@ -50,15 +50,15 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setMotorVelocity(double rotationsPerSecond) {
-        leftMotor.setControl(velocityControl.withVelocity(rotationsPerSecond));
+        shooterFollower.setControl(velocityControl.withVelocity(rotationsPerSecond));
     }
 
     public boolean isMotorAtVelocity(double rotationsPerSecond) {
-        return leftMotor.getVelocity().isNear(rotationsPerSecond, CLOSED_LOOP_TOLERANCE);
+        return shooterFollower.getVelocity().isNear(rotationsPerSecond, CLOSED_LOOP_TOLERANCE);
     }
 
     public void stopMotor() {
-        leftMotor.stopMotor();
+        shooterFollower.stopMotor();
     }
 
     public Command cmdSetMotorVelocity(double rotationsPerSecond) {
@@ -73,40 +73,40 @@ public class Shooter extends SubsystemBase {
         return Commands.runOnce(() -> stopMotor(), this);
     }
 
-    @Logged(name = "Left motor Velocity")
-    public double getLeftMotorVelocity() {
-        return leftMotor.getVelocity().getValueAsDouble();
+    @Logged(name = "Follower motor Velocity")
+    public double getFollowerVelocity() {
+        return shooterFollower.getVelocity().getValueAsDouble();
     }
 
-    @Logged(name = "Left motor Stator Current")
-    public double getLeftMotorStatorCurrent() {
-        return leftMotor.getStatorCurrent().getValueAsDouble();
+    @Logged(name = "Follower motor Stator Current")
+    public double getFollowerStatorCurrent() {
+        return shooterFollower.getStatorCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Left motor Supply Current")
-    public double getLeftMotorSupplyCurrent() {
-        return leftMotor.getSupplyCurrent().getValueAsDouble();
+    @Logged(name = "Follower motor Supply Current")
+    public double getFollowerSupplyCurrent() {
+        return shooterFollower.getSupplyCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Right motor Velocity")
-    public double getLowerRightMotorVelocity() {
-        return rightMotor.getVelocity().getValueAsDouble();
+    @Logged(name = "Leader motor Velocity")
+    public double getLeaderssVelocity() {
+        return shooterLeader.getVelocity().getValueAsDouble();
     }
 
-    @Logged(name = "Right motor Stator Current")
-    public double getLowerRightMotorStatorCurrent() {
-        return rightMotor.getStatorCurrent().getValueAsDouble();
+    @Logged(name = "Leader motor Stator Current")
+    public double getLeaderStatorCurrent() {
+        return shooterLeader.getStatorCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Right motor Supply Current")
-    public double getLowerRightMotorSupplyCurrent() {
-        return rightMotor.getSupplyCurrent().getValueAsDouble();
+    @Logged(name = "Leader motor Supply Current")
+    public double getLeaderSupplyCurrent() {
+        return shooterLeader.getSupplyCurrent().getValueAsDouble();
     }
 
     private void configureShooter() {
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
         motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
-        motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
+        motorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
 
         Slot0Configs velocityGains = new Slot0Configs()
                 .withKS(0.09)
@@ -121,11 +121,11 @@ public class Shooter extends SubsystemBase {
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
 
-        leftMotor.getConfigurator().apply(talonFXConfiguration);
-        leftMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        shooterFollower.getConfigurator().apply(talonFXConfiguration);
+        shooterFollower.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
 
-        rightMotor.getConfigurator().apply(talonFXConfiguration);
-        rightMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        rightMotor.setControl(followerControl);
+        shooterLeader.getConfigurator().apply(talonFXConfiguration);
+        shooterLeader.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        shooterLeader.setControl(followerControl);
     }
 }

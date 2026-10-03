@@ -33,9 +33,7 @@ public class Loader extends SubsystemBase {
         }
     }
 
-    private final TalonFX leftMotor = new TalonFX(4);
-    private final TalonFX rightMotor = new TalonFX(5);
-    private final Follower followerControl = new Follower(leftMotor.getDeviceID(), MotorAlignmentValue.Opposed);
+    private final TalonFX loaderMotor = new TalonFX(60);
     private final VelocityVoltage velocityControl = new VelocityVoltage(0).withSlot(0);
     private final double CLOSED_LOOP_TOLERANCE = 5;
 
@@ -57,24 +55,21 @@ public class Loader extends SubsystemBase {
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
 
-        leftMotor.getConfigurator().apply(talonFXConfiguration);
-        leftMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        loaderMotor.getConfigurator().apply(talonFXConfiguration);
+        loaderMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
 
-        rightMotor.getConfigurator().apply(talonFXConfiguration);
-        rightMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        rightMotor.setControl(followerControl);
     }
 
     public void setMotorVelocity(double rotationsPerSecond) {
-        leftMotor.setControl(velocityControl.withVelocity(rotationsPerSecond));
+        loaderMotor.setControl(velocityControl.withVelocity(rotationsPerSecond));
     }
 
     public boolean isMotorAtVelocity(double rotationsPerSecond) {
-        return leftMotor.getVelocity().isNear(rotationsPerSecond, CLOSED_LOOP_TOLERANCE);
+        return loaderMotor.getVelocity().isNear(rotationsPerSecond, CLOSED_LOOP_TOLERANCE);
     }
 
     public void stopMotor() {
-        leftMotor.stopMotor();
+        loaderMotor.stopMotor();
     }
 
     public Command cmdSetMotorVelocity(double rotationsPerSecond) {
@@ -91,31 +86,16 @@ public class Loader extends SubsystemBase {
 
     @Logged(name = "Left Motor Velocity")
     public double getLeftMotorVelocity() {
-        return leftMotor.getVelocity().getValueAsDouble();
+        return loaderMotor.getVelocity().getValueAsDouble();
     }
 
     @Logged(name = "Left Motor Stator Current")
     public double getLeftMotorStatorCurrent() {
-        return leftMotor.getStatorCurrent().getValueAsDouble();
+        return loaderMotor.getStatorCurrent().getValueAsDouble();
     }
 
     @Logged(name = "Left Motor Supply Current")
     public double getLeftMotorSupplyCurrent() {
-        return leftMotor.getSupplyCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Right Motor Velocity")
-    public double getRightMotorVelocity() {
-        return rightMotor.getVelocity().getValueAsDouble();
-    }
-
-    @Logged(name = "Right Motor Stator Current")
-    public double getRightMotorStatorCurrent() {
-        return rightMotor.getStatorCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Right Motor Supply Current")
-    public double getRightMotorSupplyCurrent() {
-        return rightMotor.getSupplyCurrent().getValueAsDouble();
+        return loaderMotor.getSupplyCurrent().getValueAsDouble();
     }
 }
