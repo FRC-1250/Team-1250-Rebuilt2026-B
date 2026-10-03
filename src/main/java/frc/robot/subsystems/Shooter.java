@@ -40,8 +40,7 @@ public class Shooter extends SubsystemBase {
     }
 
     private final TalonFX leftMotor = new TalonFX(1);
-    private final TalonFX upperRightMotor = new TalonFX(2);
-    private final TalonFX lowerRightMotor = new TalonFX(3);
+    private final TalonFX rightMotor = new TalonFX(3);
     private final Follower followerControl = new Follower(leftMotor.getDeviceID(), MotorAlignmentValue.Opposed);
     private final VelocityVoltage velocityControl = new VelocityVoltage(0).withSlot(0);
     private final double CLOSED_LOOP_TOLERANCE = 5;
@@ -89,34 +88,19 @@ public class Shooter extends SubsystemBase {
         return leftMotor.getSupplyCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Upper Right motor Velocity")
-    public double getUpperRightMotorVelocity() {
-        return upperRightMotor.getVelocity().getValueAsDouble();
-    }
-
-    @Logged(name = "Upper Right motor Stator Current")
-    public double getUpperRightMotorStatorCurrent() {
-        return upperRightMotor.getStatorCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Upper Right motor Supply Current")
-    public double getUpperRightMotorSupplyCurrent() {
-        return upperRightMotor.getSupplyCurrent().getValueAsDouble();
-    }
-
-    @Logged(name = "Lower Right motor Velocity")
+    @Logged(name = "Right motor Velocity")
     public double getLowerRightMotorVelocity() {
-        return lowerRightMotor.getVelocity().getValueAsDouble();
+        return rightMotor.getVelocity().getValueAsDouble();
     }
 
-    @Logged(name = "Lower Right motor Stator Current")
+    @Logged(name = "Right motor Stator Current")
     public double getLowerRightMotorStatorCurrent() {
-        return lowerRightMotor.getStatorCurrent().getValueAsDouble();
+        return rightMotor.getStatorCurrent().getValueAsDouble();
     }
 
-    @Logged(name = "Lower Right motor Supply Current")
+    @Logged(name = "Right motor Supply Current")
     public double getLowerRightMotorSupplyCurrent() {
-        return lowerRightMotor.getSupplyCurrent().getValueAsDouble();
+        return rightMotor.getSupplyCurrent().getValueAsDouble();
     }
 
     private void configureShooter() {
@@ -140,12 +124,8 @@ public class Shooter extends SubsystemBase {
         leftMotor.getConfigurator().apply(talonFXConfiguration);
         leftMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
 
-        lowerRightMotor.getConfigurator().apply(talonFXConfiguration);
-        lowerRightMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        lowerRightMotor.setControl(followerControl);
-
-        upperRightMotor.getConfigurator().apply(talonFXConfiguration);
-        upperRightMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        upperRightMotor.setControl(followerControl);
+        rightMotor.getConfigurator().apply(talonFXConfiguration);
+        rightMotor.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        rightMotor.setControl(followerControl);
     }
 }
