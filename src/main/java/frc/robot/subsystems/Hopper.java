@@ -30,8 +30,8 @@ public class Hopper extends SubsystemBase {
     public enum HopperPosition {
         REVERSE_LIMIT(0),
         HOME(0.0),
-        DEPLOYED(0),
-        FORWARD_LIMIT(4.05);
+        DEPLOYED(14.98),
+        FORWARD_LIMIT(15);
 
         public double rotations;
 
@@ -53,14 +53,14 @@ public class Hopper extends SubsystemBase {
 
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
         motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
-        motorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
+        motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
 
         Slot0Configs positionGains = new Slot0Configs();
         positionGains.GravityType = GravityTypeValue.Elevator_Static;
         positionGains.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
         positionGains.kS = 0.4; // output to overcome static friction (output)
         positionGains.kV = 0.15; // output per unit of target velocity (output/rps)
-        positionGains.kG = -0.7;
+        positionGains.kG = 0.7;
         positionGains.kA = 0; // output per unit of target acceleration (output/(rps/s))
         positionGains.kP = 2; // output per unit of error in position (output/rotation)
         positionGains.kI = 0; // output per unit of integrated error in position (output/(rotation*s))
@@ -72,9 +72,9 @@ public class Hopper extends SubsystemBase {
 
         SoftwareLimitSwitchConfigs softwareLimitSwitchConfigs = new SoftwareLimitSwitchConfigs();
         softwareLimitSwitchConfigs.ForwardSoftLimitEnable = true;
-        softwareLimitSwitchConfigs.ForwardSoftLimitThreshold = 4;
+        softwareLimitSwitchConfigs.ForwardSoftLimitThreshold = HopperPosition.FORWARD_LIMIT.rotations;
         softwareLimitSwitchConfigs.ReverseSoftLimitEnable = true;
-        softwareLimitSwitchConfigs.ReverseSoftLimitThreshold = 0;
+        softwareLimitSwitchConfigs.ReverseSoftLimitThreshold = HopperPosition.REVERSE_LIMIT.rotations;
 
         MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
         motionMagicConfigs.MotionMagicCruiseVelocity = 8;

@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase {
     public enum IntakeVelocity {
         UNJAM(-25),
-        COLLECT(80);
+        COLLECT(75);
 
         public double rotationsPerSecond;
 
