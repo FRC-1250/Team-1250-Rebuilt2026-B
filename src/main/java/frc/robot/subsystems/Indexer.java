@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Indexer extends SubsystemBase {
     public enum IndexerVelocity {
         UNJAM(-10),
-        LOAD(25);
+        LOAD(50);
 
         public double rotationsPerSecond;
 

@@ -24,7 +24,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 public class Loader extends SubsystemBase {
     public enum LoaderVelocity {
         UNJAM(-10),
-        LOAD(25);
+        LOAD(50);
 
         public double rotationsPerSecond;
 

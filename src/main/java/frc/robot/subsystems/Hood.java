@@ -23,12 +23,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hood extends SubsystemBase {
     public enum HoodPosition {
-        REVERSE_LIMIT(0.0),
-        HOME(0.0),
-        ALLIANCE_ZONE(0.0),
-        NEUTRAL_ZONE(0.0),
-        OPPOSSING_ALLIANCE_ZONE(0.0),
-        FORWARD_LIMIT(0.0);
+        REVERSE_LIMIT(.248),
+        HOME(0.254),
+        ALLIANCE_ZONE(0.3),
+        NEUTRAL_ZONE(0.3),
+        OPPOSSING_ALLIANCE_ZONE(0.3),
+        FORWARD_LIMIT(.334);
 
         public double rotations;
         public double angle;
