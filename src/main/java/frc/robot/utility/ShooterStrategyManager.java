@@ -59,7 +59,7 @@ public class ShooterStrategyManager {
             activeState = new ShooterState(
                     activeStrategy.getHoodPosition(),
                     shooterVelocity,
-                    operatorRelativeTargetAngle,
+                    operatorRelativeTargetAngle.plus(Rotation2d.k180deg),
                     isAligned(fieldRelativeTargetAngle, swerveDriveState.Pose.getRotation()));
         } else {
             activeState = new ShooterState(
