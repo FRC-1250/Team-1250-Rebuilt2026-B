@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Hopper extends SubsystemBase {
     public enum HopperPosition {
         REVERSE_LIMIT(0),
-        HOME(0.0),
+        HOME(0.1),
         DEPLOYED(14.98),
         FORWARD_LIMIT(15);
 
