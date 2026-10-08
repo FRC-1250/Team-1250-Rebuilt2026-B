@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CenterDiveStart"
+            "pathName": "Example Path Pt1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenterDivePt2"
+            "pathName": "New Path"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FireFuel"
           }
         }
       ]

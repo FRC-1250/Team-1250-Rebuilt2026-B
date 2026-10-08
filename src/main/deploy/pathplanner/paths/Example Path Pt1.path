@@ -64,16 +64,16 @@
     },
     {
       "anchor": {
-        "x": 2.4601457538924025,
-        "y": 3.9802124818827833
+        "x": 0.630133778854421,
+        "y": 7.258622560386845
       },
       "prevControl": {
-        "x": 2.5012455007187397,
-        "y": 4.22681096284082
+        "x": 0.6712335256807578,
+        "y": 7.505221041344882
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "ExamplePathEndBeginner1"
+      "linkedName": "LeftTrenchSweep+DepotPt1Real"
     }
   ],
   "rotationTargets": [
@@ -98,8 +98,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "",
-      "waypointRelativePos": 0,
+      "name": "CollectFuel",
+      "waypointRelativePos": 0.31496062992125123,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -114,7 +114,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -179.1574757392596
+    "rotation": -89.87277532655197
   },
   "reversed": false,
   "folder": null,
