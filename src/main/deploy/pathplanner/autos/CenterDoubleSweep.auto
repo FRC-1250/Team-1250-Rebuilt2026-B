@@ -19,13 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftTrenchDiveExtension1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftTrenchDiveExtension2"
+            "pathName": "LeftTrenchSecondDive"
           }
         }
       ]

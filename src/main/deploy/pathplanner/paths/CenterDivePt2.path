@@ -32,16 +32,16 @@
     },
     {
       "anchor": {
-        "x": 2.750533807829182,
-        "y": 4.815041518386713
+        "x": 2.8,
+        "y": 5.8
       },
       "prevControl": {
-        "x": 3.3100118623962045,
-        "y": 5.159335705812574
+        "x": 3.359478054567022,
+        "y": 6.144294187425861
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LeftTrenchDive4"
+      "linkedName": "LeftFiringPosition"
     }
   ],
   "rotationTargets": [
@@ -63,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 148.81502534126156
+    "rotation": 135.0
   },
   "reversed": false,
   "folder": null,

@@ -7,37 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftTrenchDiveStart"
+            "pathName": "LeftTrenchFirstDive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FireFuel"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LeftTrenchDivePt2"
+            "pathName": "LeftTrenchSecondDive"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "LeftTrenchDivePt3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftTrenchDivePt4"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftTrenchDiveExtension1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftTrenchDiveExtension2"
+            "name": "FireFuel"
           }
         }
       ]
