@@ -30,7 +30,7 @@ public class Hopper extends SubsystemBase {
     public enum HopperPosition {
         REVERSE_LIMIT(0),
         HOME(0.1),
-        DEPLOYED(14.98),
+        DEPLOYED(14.9),
         FORWARD_LIMIT(15);
 
         public double rotations;
