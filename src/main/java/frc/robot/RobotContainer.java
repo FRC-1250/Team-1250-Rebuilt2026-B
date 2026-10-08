@@ -203,7 +203,7 @@ public class RobotContainer {
                         ShooterVelocity.TOWER,
                         HoodPosition.ALLIANCE_ZONE)
                         .withName("Shoot default"));
-                        
+
         primary.rightTrigger().negate().and(primary.leftTrigger().negate())
                 .whileTrue(hood.cmdSetMotorPosition(HoodPosition.HOME));
 
@@ -254,7 +254,10 @@ public class RobotContainer {
          * default
          */
         autoChooser.setDefaultOption("Do nothing", new WaitCommand(15));
-        addPathAuto("LeftTrenchSweep", "LeftTrenchSweep");
+        addPathAuto("LeftTrenchSingleSweep", "LeftTrenchSingleSweep");
+        addPathAuto("RightTrenchSingleSweep", "RightTrenchSingleSweep");
+        addPathAuto("CenterDepotOutpost", "CenterDepotOutpost");
+
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
@@ -262,6 +265,18 @@ public class RobotContainer {
         NamedCommands.registerCommand("FireFuel",
                 commandFactory.cmdFireFuel(
                         ShooterVelocity.TOWER,
-                        HoodPosition.ALLIANCE_ZONE).withTimeout(3));
+                        HoodPosition.ALLIANCE_ZONE).withTimeout(3)
+                        .andThen(hood.cmdSetMotorPosition(HoodPosition.HOME)));
+
+        NamedCommands.registerCommand("FireFuelByDistance",
+                commandFactory.cmdFireFuel(
+                        () -> getVelocityBasedOnTargetDistance(),
+                        () -> getHoodPositionBasedOnZone().rotations).withTimeout(3)
+                        .andThen(hood.cmdSetMotorPosition(HoodPosition.HOME)));
+
+        NamedCommands.registerCommand("CollectFuel", commandFactory.cmdCollectFuel());
+
+        NamedCommands.registerCommand("WarmShooter",
+                shooter.cmdSetMotorVelocity(ShooterVelocity.WARM));
     }
 }

@@ -9,6 +9,12 @@
           "data": {
             "pathName": "LeftTrenchFirstDive"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FireFuelByDistance"
+          }
         }
       ]
     }

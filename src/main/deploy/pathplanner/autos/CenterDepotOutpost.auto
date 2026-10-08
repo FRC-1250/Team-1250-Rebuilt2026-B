@@ -7,19 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftTrenchFirstDive"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "FireFuelByDistance"
+            "pathName": "CenterToDepotCollectStart"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LeftTrenchSecondDive"
+            "pathName": "DepotCollect"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DepotToOutpost"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "OutpostCollect"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "OutpostCollectToRightFiringPosition"
           }
         },
         {

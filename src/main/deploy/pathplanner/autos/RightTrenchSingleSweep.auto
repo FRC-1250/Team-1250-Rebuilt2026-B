@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftTrenchFirstDive"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "FireFuelByDistance"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftTrenchSecondDive"
+            "pathName": "RightTrenchFirstDive"
           }
         },
         {
