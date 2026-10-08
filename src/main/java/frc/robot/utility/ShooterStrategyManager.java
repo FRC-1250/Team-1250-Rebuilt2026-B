@@ -1,6 +1,5 @@
 package frc.robot.utility;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,7 +93,7 @@ public class ShooterStrategyManager {
         if (lookUpTable != null) {
             velocity = lookUpTable.get(distance);
         }
-        return velocity;
+        return Math.min(velocity, ShooterVelocity.MAX.rotationsPerSecond);
     }
 
     private Optional<ShooterStrategy> getStrategy(List<Zone> activeZones, Alliance alliance) {

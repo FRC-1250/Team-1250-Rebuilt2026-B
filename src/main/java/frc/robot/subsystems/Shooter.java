@@ -26,11 +26,9 @@ public class Shooter extends SubsystemBase {
 
     public enum ShooterVelocity {
         UNJAM(-10),
-        WARM(10.0),
-        MIN(40.0),
+        WARM(20.0),
         TOWER(48.0),
-        TRENCH(55.0),
-        MAX(80.0); // Do not go any faster than this
+        MAX(75.0); // Do not go any faster than this
 
         public double rotationsPerSecond;
 
@@ -123,31 +121,5 @@ public class Shooter extends SubsystemBase {
     @Logged(name = "Leader motor Supply Current")
     public double getLeaderSupplyCurrent() {
         return shooterLeader.getSupplyCurrent().getValueAsDouble();
-    }
-
-    private void configureShooter() {
-        MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
-        motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
-        motorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
-
-        Slot0Configs velocityGains = new Slot0Configs()
-                .withKS(0.09)
-                .withKV(0.11)
-                .withKP(0.25)
-                .withKI(0)
-                .withKD(0.01);
-
-        TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
-        talonFXConfiguration.Slot0 = velocityGains;
-        talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = 50;
-        talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
-        talonFXConfiguration.MotorOutput = motorOutputConfigs;
-
-        shooterFollower.getConfigurator().apply(talonFXConfiguration);
-        shooterFollower.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-
-        shooterLeader.getConfigurator().apply(talonFXConfiguration);
-        shooterLeader.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        shooterLeader.setControl(followerControl);
     }
 }
