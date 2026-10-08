@@ -25,9 +25,9 @@ public class Hood extends SubsystemBase {
     public enum HoodPosition {
         REVERSE_LIMIT(.248),
         HOME(0.254),
-        ALLIANCE_ZONE(0.3),
-        NEUTRAL_ZONE(0.3),
-        OPPOSSING_ALLIANCE_ZONE(0.3),
+        ALLIANCE_ZONE(0.274),
+        NEUTRAL_ZONE(0.274),
+        OPPOSSING_ALLIANCE_ZONE(0.274),
         FORWARD_LIMIT(.334);
 
         public double rotations;

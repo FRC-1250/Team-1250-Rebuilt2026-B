@@ -27,8 +27,8 @@ public class Shooter extends SubsystemBase {
     public enum ShooterVelocity {
         UNJAM(-10),
         WARM(20.0),
-        TOWER(48.0),
-        MAX(75.0); // Do not go any faster than this
+        SHOOT(50.0),
+        MAX(52.0); // Do not go any faster than this
 
         public double rotationsPerSecond;
 

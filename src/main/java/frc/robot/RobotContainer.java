@@ -200,7 +200,7 @@ public class RobotContainer {
 
         primary.rightTrigger().and(primary.leftTrigger().negate())
                 .whileTrue(commandFactory.cmdFireFuel(
-                        ShooterVelocity.TOWER,
+                        ShooterVelocity.SHOOT,
                         HoodPosition.ALLIANCE_ZONE)
                         .withName("Shoot default"));
 
@@ -264,7 +264,7 @@ public class RobotContainer {
     private void configureNamedCommands() {
         NamedCommands.registerCommand("FireFuel",
                 commandFactory.cmdFireFuel(
-                        ShooterVelocity.TOWER,
+                        ShooterVelocity.SHOOT,
                         HoodPosition.ALLIANCE_ZONE).withTimeout(3)
                         .andThen(hood.cmdSetMotorPosition(HoodPosition.HOME)));
 
