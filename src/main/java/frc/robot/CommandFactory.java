@@ -2,6 +2,11 @@ package frc.robot;
 
 import java.util.function.DoubleSupplier;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Hood;
@@ -24,6 +29,14 @@ public class CommandFactory {
     private final Intake intake;
     private final Loader loader;
     private final Shooter shooter;
+
+    private final PathConstraints pathConstraints = new PathConstraints(
+            2,
+            4.0,
+            Units.degreesToRadians(270),
+            Units.degreesToRadians(540),
+            12,
+            false);
 
     public CommandFactory(
             Hood hood,
@@ -102,4 +115,7 @@ public class CommandFactory {
                 hopper.cmdSetMotorPosition(HopperPosition.HOME));
     }
 
+    public Command cmdPathFindToPose(Pose2d targetPose) {
+        return AutoBuilder.pathfindToPoseFlipped(targetPose, pathConstraints);
+    }
 }

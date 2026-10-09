@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -49,6 +50,7 @@ import frc.robot.utility.HubTracker;
 import frc.robot.utility.HubTracker.Shift;
 import frc.robot.utility.RobotLocalization;
 import frc.robot.utility.ShooterStrategyManager;
+import frc.robot.utility.FieldLocalization.ShootingLocation;
 
 public class RobotContainer {
     private final Swerve swerve = TunerConstants.createDrivetrain();
@@ -243,6 +245,40 @@ public class RobotContainer {
                                 .withHeadingPID(15, 0, 0)
                                 .withTargetDirection(swerve.getOperatorForwardDirection()))
                         .withName("Snap forward"));
+
+        primary.x().whileTrue(
+                Commands.sequence(
+                        Commands.either(
+                                commandFactory.cmdPathFindToPose(ShootingLocation.LEFT.pose),
+                                commandFactory.cmdPathFindToPose(ShootingLocation.RIGHT.pose),
+                                () -> {
+                                    var pose = swerve.getState().Pose;
+                                    var leftDiff = ShootingLocation.LEFT.pose.getTranslation()
+                                            .getDistance(pose.getTranslation());
+                                    var rightDiff = ShootingLocation.RIGHT.pose.getTranslation()
+                                            .getDistance(pose.getTranslation());
+
+                                    // When PathPlanner flips the point, it does so by mirroring it over the Y axis.
+                                    // So left becomes right and right becomes left on the red side.
+                                    // Flipping the conditional for red allows for "left" to still be on the left
+                                    // side of the field.
+                                    // TODO: A map similar to what is used in the ShooterStrategyManager would work
+                                    // better for this.
+
+                                    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+                                        return leftDiff > rightDiff;
+                                    } else {
+                                        return leftDiff < rightDiff;
+                                    }
+                                }),
+                        swerve.applyRequest(
+                                () -> driveWithAngle
+                                        .withVelocityX(0)
+                                        .withVelocityY(0)
+                                        .withHeadingPID(15, 0, 0)
+                                        .withTargetDirection(getRotationToTargetBasedOnZone()))
+                                .withTimeout(0.5)
+                                .withName("Field centric facing angle")));
 
         primary.rightBumper().onTrue(commandFactory.cmdCollectFuel().withName("Collect fuel"));
         primary.leftBumper().onTrue(commandFactory.cmdStopCollectFuel().withName("Stop collect fuel"));
