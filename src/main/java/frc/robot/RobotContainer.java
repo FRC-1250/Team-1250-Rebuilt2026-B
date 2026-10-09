@@ -212,7 +212,9 @@ public class RobotContainer {
                 .whileTrue(commandFactory.cmdFireFuel(
                         ShooterVelocity.SHOOT)
                         .withName("Shoot default"));
-
+        primary.rightTrigger()
+                .whileFalse(commandFactory.cmdStopFireFuel()
+                        .withName("Shoot Stop"));
         primary.leftTrigger().whileTrue(
                 swerve.applyRequest(
                         () -> driveWithAngle

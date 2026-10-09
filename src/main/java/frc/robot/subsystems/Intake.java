@@ -43,7 +43,7 @@ public class Intake extends SubsystemBase {
     public Intake() {
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
         motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
-        motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
+        motorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
 
         Slot0Configs velocityGains = new Slot0Configs()
                 .withKS(0.1)

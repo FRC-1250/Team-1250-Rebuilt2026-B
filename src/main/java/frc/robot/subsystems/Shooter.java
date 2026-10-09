@@ -46,7 +46,7 @@ public class Shooter extends SubsystemBase {
     public Shooter() {
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
         motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
-        motorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
+        motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
 
         Slot0Configs velocityGains = new Slot0Configs()
                 .withKS(0.09)
