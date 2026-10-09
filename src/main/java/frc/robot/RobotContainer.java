@@ -208,8 +208,7 @@ public class RobotContainer {
 
         primary.rightTrigger()
                 .whileTrue(commandFactory.cmdFireFuel(
-                        ShooterVelocity.SHOOT,
-                        HoodPosition.ALLIANCE_ZONE)
+                        ShooterVelocity.SHOOT)
                         .withName("Shoot default"));
 
         primary.leftTrigger().whileTrue(
@@ -232,7 +231,7 @@ public class RobotContainer {
                         () -> driveWithAngle
                                 .withVelocityX(yLimiter.calculate(-primary.getLeftY() * (MaxSpeed * 0.33)))
                                 .withVelocityY(xLimiter.calculate(-primary.getLeftX() * (MaxSpeed * 0.33)))
-                                .withHeadingPID(0, 0, 0)
+                                .withHeadingPID(15, 0, 0)
                                 .withTargetDirection(swerve.getOperatorForwardDirection().plus(Rotation2d.k180deg)))
                         .withName("Snap backwards"));
 
@@ -275,8 +274,7 @@ public class RobotContainer {
     private void configureNamedCommands() {
         NamedCommands.registerCommand("FireFuel",
                 commandFactory.cmdFireFuel(
-                        ShooterVelocity.SHOOT,
-                        HoodPosition.ALLIANCE_ZONE).withTimeout(3)
+                        ShooterVelocity.SHOOT).withTimeout(3)
                         .andThen(hood.cmdSetMotorPosition(HoodPosition.HOME)));
 
         NamedCommands.registerCommand("FireFuelByDistance",
