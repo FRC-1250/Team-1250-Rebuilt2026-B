@@ -20,6 +20,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -88,6 +89,8 @@ public class RobotContainer {
     private final SlewRateLimiter xLimiter = new SlewRateLimiter(20, -20, 0);
     private final SlewRateLimiter yLimiter = new SlewRateLimiter(20, -20, 0);
 
+    private final Telemetry logger = new Telemetry();
+
     private final double SHIFT_CLOCK_WARNING = 8.0;
     private final double SHIFT_CLOCK_PRE_FIRE = 2.0;
     private double timeLeftInShift = 0;
@@ -115,6 +118,11 @@ public class RobotContainer {
 
     private final Trigger robotIsAligned = new Trigger(() -> targetManager.getTargetingState().isAligned());
 
+    private final Trigger robotInRange = new Trigger(() -> {
+        var distance = getTargetDistance();
+        return distance >= Units.feetToMeters(5.5) && distance <= Units.feetToMeters(6.5);
+    });
+
     private final FieldCentric drive = new FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
@@ -127,6 +135,7 @@ public class RobotContainer {
         configureButtonBindings();
         configureNamedCommands();
         configureAutoCommands();
+        swerve.registerTelemetry(logger::telemeterize);
     }
 
     public Shift getShift() {
@@ -212,15 +221,11 @@ public class RobotContainer {
                                 .withTargetDirection(getRotationToTargetBasedOnZone()))
                         .withName("Field centric facing angle"));
 
-        primary.leftTrigger().whileTrue(
-                Commands.run(() -> {
-                    var distance = getTargetDistance();
-                    if (distance >= 6.5 && distance <= 5.5) {
-                        primary.setRumble(RumbleType.kBothRumble, 0.25);
-                    } else {
-                        primary.setRumble(RumbleType.kBothRumble, 0);
-                    }
-                }));
+        primary.leftTrigger().and(robotInRange)
+                .onTrue(Commands.runOnce(() -> primary.setRumble(RumbleType.kBothRumble,
+                        0.3)).withName("Rumble on"))
+                .onFalse(Commands.runOnce(() -> primary.setRumble(RumbleType.kBothRumble,
+                        0)).withName("Rubmle off"));
 
         primary.b().whileTrue(
                 swerve.applyRequest(
