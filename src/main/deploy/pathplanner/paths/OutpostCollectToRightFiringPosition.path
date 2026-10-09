@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 2.8258481613285884,
-        "y": 3.007497034400949
+        "x": 3.0302728351126933,
+        "y": 3.125978647686834
       },
       "prevControl": {
-        "x": 1.9340153798716346,
-        "y": 2.5852314714870426
+        "x": 2.1384400536557395,
+        "y": 2.7037130847729274
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "RightSHOOTFiringPosition"
+      "linkedName": "RightFiringPosition"
     }
   ],
   "rotationTargets": [],
@@ -33,10 +33,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.5,
-    "maxAcceleration": 3.0,
-    "maxAngularVelocity": 270.0,
-    "maxAngularAcceleration": 640.0,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },

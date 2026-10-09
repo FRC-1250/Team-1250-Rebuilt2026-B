@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Example Path Pt1"
+            "pathName": "LeftTrenchDiveToDepot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "New Path"
+            "pathName": "DepotCollect"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DepotCollectToLeftFiringPosition"
           }
         },
         {
