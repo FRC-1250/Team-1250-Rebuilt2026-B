@@ -19,6 +19,7 @@ public class ShooterStrategyManager {
             HoodPosition hoodPosition,
             double shooterVelocity,
             Rotation2d targetAngle,
+            double distance,
             boolean isAligned) {
     }
 
@@ -26,6 +27,7 @@ public class ShooterStrategyManager {
             HoodPosition.HOME,
             ShooterVelocity.WARM.rotationsPerSecond,
             Rotation2d.kZero,
+            0,
             false);
 
     private final double ANGLE_TOLERANCE = 2.5;
@@ -59,12 +61,14 @@ public class ShooterStrategyManager {
                     activeStrategy.getHoodPosition(),
                     shooterVelocity,
                     operatorRelativeTargetAngle.plus(Rotation2d.k180deg),
+                    distance,
                     isAligned(fieldRelativeTargetAngle, swerveDriveState.Pose.getRotation()));
         } else {
             activeState = new ShooterState(
                     HoodPosition.HOME,
                     ShooterVelocity.WARM.rotationsPerSecond,
                     operatorForwardDirection,
+                    0,
                     false);
         }
     }

@@ -24,6 +24,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -182,6 +183,10 @@ public class RobotContainer {
         return targetManager.getTargetingState().hoodPosition();
     }
 
+    private double getTargetDistance() {
+        return targetManager.getTargetingState().distance();
+    }
+
     private void configureButtonBindings() {
         swerve.setDefaultCommand(
                 swerve.applyRequest(() -> drive
@@ -192,20 +197,11 @@ public class RobotContainer {
 
         primary.start().onTrue(swerve.runOnce(() -> swerve.seedFieldCentric()).withName("Seed field centric"));
 
-        primary.rightTrigger().and(primary.leftTrigger()).and(robotIsAligned)
-                .whileTrue(commandFactory.cmdFireFuel(
-                        () -> getVelocityBasedOnTargetDistance(),
-                        () -> getHoodPositionBasedOnZone().rotations)
-                        .withName("Shoot by distance"));
-
-        primary.rightTrigger().and(primary.leftTrigger().negate())
+        primary.rightTrigger()
                 .whileTrue(commandFactory.cmdFireFuel(
                         ShooterVelocity.SHOOT,
                         HoodPosition.ALLIANCE_ZONE)
                         .withName("Shoot default"));
-
-        primary.rightTrigger().negate().and(primary.leftTrigger().negate())
-                .whileTrue(hood.cmdSetMotorPosition(HoodPosition.HOME));
 
         primary.leftTrigger().whileTrue(
                 swerve.applyRequest(
@@ -215,6 +211,16 @@ public class RobotContainer {
                                 .withHeadingPID(15, 0, 0)
                                 .withTargetDirection(getRotationToTargetBasedOnZone()))
                         .withName("Field centric facing angle"));
+
+        primary.leftTrigger().whileTrue(
+                Commands.run(() -> {
+                    var distance = getTargetDistance();
+                    if (distance >= 6.5 && distance <= 5.5) {
+                        primary.setRumble(RumbleType.kBothRumble, 0.25);
+                    } else {
+                        primary.setRumble(RumbleType.kBothRumble, 0);
+                    }
+                }));
 
         primary.b().whileTrue(
                 swerve.applyRequest(
