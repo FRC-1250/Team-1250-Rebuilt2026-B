@@ -5,12 +5,16 @@
 package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.pathfinding.LocalADStar;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -23,8 +27,12 @@ public class Robot extends TimedRobot {
     @Logged(name = "RobotContainer")
     private final RobotContainer robotContainer;
 
+    private final Timer m_gcTimer;
+
     public Robot() {
         robotContainer = new RobotContainer();
+        m_gcTimer = new Timer();
+        m_gcTimer.start();
 
         DriverStation.startDataLog(DataLogManager.getLog());
         Epilogue.bind(this);
@@ -44,8 +52,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        HealthMonitor.getInstance().start();
+        Pathfinding.setPathfinder(new LocalADStar());
         CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+        CommandScheduler.getInstance().schedule(PathfindingCommand.warmupCommand());
         LimelightHelpers.setupPortForwardingUSB(0);
     }
 
@@ -59,6 +68,10 @@ public class Robot extends TimedRobot {
         SmartDashboard.putString("Shift", robotContainer.getShift().toString());
         SmartDashboard.putNumber("Match time", DriverStation.getMatchTime());
         CommandScheduler.getInstance().run();
+
+        if (m_gcTimer.advanceIfElapsed(15)) {
+            System.gc();
+        }
     }
 
     @Override
