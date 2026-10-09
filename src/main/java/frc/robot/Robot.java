@@ -20,7 +20,7 @@ import frc.robot.utility.LimelightHelpers;
 public class Robot extends TimedRobot {
     private Command autonomousCommand;
 
-    @Logged(name = "Robot")
+    @Logged(name = "RobotContainer")
     private final RobotContainer robotContainer;
 
     public Robot() {
