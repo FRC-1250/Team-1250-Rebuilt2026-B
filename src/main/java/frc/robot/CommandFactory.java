@@ -97,7 +97,7 @@ public class CommandFactory {
 
     public Command cmdStopFireFuel() {
         return Commands.run(() -> {
-            shooter.setMotorVelocity(ShooterVelocity.WARM.rotationsPerSecond);
+            shooter.stopMotor();
             loader.stopMotor();
             indexer.stopMotor();
         }, shooter, loader, indexer);
@@ -121,9 +121,9 @@ public class CommandFactory {
 
     public Command cmdResetMotorPositionByAmps() {
         return Commands.sequence(
-                intake.cmdSetMotorVelocity(0),
+                intake.cmdStopMotor(),
                 Commands.waitUntil(() -> intake.isMotorAtVelocity(0)),
-                Commands.runOnce(() -> hopper.setMotorPercentOut(-0.2), hopper),
+                Commands.runOnce(() -> hopper.setMotorPercentOut(-0.3), hopper),
                 Commands.waitUntil(() -> hopper.isMotorCurrentAbove(40)),
                 Commands.runOnce(() -> hopper.setPosition(HopperPosition.REVERSE_LIMIT.rotations)),
                 Commands.runOnce(() -> hopper.setMotorPosition(HopperPosition.HOME.rotations)));
