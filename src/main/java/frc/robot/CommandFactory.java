@@ -118,4 +118,14 @@ public class CommandFactory {
     public Command cmdPathFindToPose(Pose2d targetPose) {
         return AutoBuilder.pathfindToPoseFlipped(targetPose, pathConstraints);
     }
+
+    public Command cmdResetMotorPositionByAmps() {
+        return Commands.sequence(
+                intake.cmdSetMotorVelocity(0),
+                Commands.waitUntil(() -> intake.isMotorAtVelocity(0)),
+                Commands.runOnce(() -> hopper.setMotorPercentOut(-0.2), hopper),
+                Commands.waitUntil(() -> hopper.isMotorCurrentAbove(40)),
+                Commands.runOnce(() -> hopper.setPosition(HopperPosition.REVERSE_LIMIT.rotations)),
+                Commands.runOnce(() -> hopper.setMotorPosition(HopperPosition.HOME.rotations)));
+    }
 }
