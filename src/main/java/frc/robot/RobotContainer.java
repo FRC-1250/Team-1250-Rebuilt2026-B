@@ -303,6 +303,7 @@ public class RobotContainer {
          */
         autoChooser.setDefaultOption("Do nothing", new WaitCommand(15));
         addPathAuto("LeftTrenchSingleSweep", "LeftTrenchSingleSweep");
+        addPathAuto("LeftTrenchSweep+Depot", "LeftTrenchSweep+Depot");
         addPathAuto("RightTrenchSingleSweep", "RightTrenchSingleSweep");
         addPathAuto("CenterDepotOutpost", "CenterDepotOutpost");
 

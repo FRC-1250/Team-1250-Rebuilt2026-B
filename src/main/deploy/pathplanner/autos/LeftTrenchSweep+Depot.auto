@@ -11,18 +11,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "DepotCollect"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "DepotCollectToLeftFiringPosition"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "FireFuel"
