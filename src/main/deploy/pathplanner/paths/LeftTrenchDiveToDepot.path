@@ -113,8 +113,8 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 3.442402826855138,
-      "maxWaypointRelativePos": 3.6233215547702873,
+      "minWaypointRelativePos": 3.15,
+      "maxWaypointRelativePos": 3.45,
       "constraints": {
         "maxVelocity": 0.75,
         "maxAcceleration": 3.0,
@@ -129,9 +129,25 @@
   "eventMarkers": [
     {
       "name": "CollectFuel",
-      "waypointRelativePos": 0.31496062992125123,
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "CollectFuel"
+        }
+      }
+    },
+    {
+      "name": "WarmShooter",
+      "waypointRelativePos": 2.5,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "WarmShooter"
+        }
+      }
     }
   ],
   "globalConstraints": {

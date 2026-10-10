@@ -115,13 +115,23 @@
       "name": "CollectFuel",
       "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "CollectFuel"
+        }
+      }
     },
     {
       "name": "WarmShooter",
-      "waypointRelativePos": 2.996466431095528,
+      "waypointRelativePos": 2.5,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "WarmShooter"
+        }
+      }
     }
   ],
   "globalConstraints": {
