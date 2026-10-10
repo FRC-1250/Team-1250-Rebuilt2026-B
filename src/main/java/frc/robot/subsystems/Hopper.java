@@ -31,8 +31,8 @@ public class Hopper extends SubsystemBase {
     public enum HopperPosition {
         REVERSE_LIMIT(0),
         HOME(0.1),
-        DEPLOYED(15),
-        FORWARD_LIMIT(15.1);
+        DEPLOYED(15.1),
+        FORWARD_LIMIT(15.15);
 
         public double rotations;
 
@@ -91,8 +91,8 @@ public class Hopper extends SubsystemBase {
         motor.getConfigurator().apply(talonFXConfiguration);
         motor.setPosition(0);
         motor.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
-        SmartDashboard.putData("Reset hopper position (deployed)", cmdSetMotorPosition(HopperPosition.FORWARD_LIMIT));
-        SmartDashboard.putData("Reset hopper position (home)", cmdSetMotorPosition(HopperPosition.REVERSE_LIMIT));
+        SmartDashboard.putData("Reset hopper position (deployed)", cmdResetMotorDeployedPosition());
+        SmartDashboard.putData("Reset hopper position (home)", cmdResetMotorHomePosition());
     }
 
     public void setMotorPosition(double rotations) {
@@ -123,9 +123,15 @@ public class Hopper extends SubsystemBase {
         return Commands.runOnce(() -> stopMotor(), this);
     }
 
-    public Command cmdResetMotorPosition() {
+    public Command cmdResetMotorHomePosition() {
         return Commands.runOnce(() -> {
-            this.setPosition(0);
+            this.setPosition(HopperPosition.REVERSE_LIMIT.rotations);
+        }).ignoringDisable(true);
+    }
+
+    public Command cmdResetMotorDeployedPosition() {
+        return Commands.runOnce(() -> {
+            this.setPosition(HopperPosition.FORWARD_LIMIT.rotations);
         }).ignoringDisable(true);
     }
 
