@@ -59,9 +59,9 @@ public class Hopper extends SubsystemBase {
         Slot0Configs positionGains = new Slot0Configs();
         positionGains.GravityType = GravityTypeValue.Elevator_Static;
         positionGains.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
-        positionGains.kS = 0.4; // output to overcome static friction (output)
+        positionGains.kS = 0.9; // output to overcome static friction (output)
         positionGains.kV = 0.15; // output per unit of target velocity (output/rps)
-        positionGains.kG = 0.7;
+        positionGains.kG = 1.2;
         positionGains.kA = 0; // output per unit of target acceleration (output/(rps/s))
         positionGains.kP = 2; // output per unit of error in position (output/rotation)
         positionGains.kI = 0; // output per unit of integrated error in position (output/(rotation*s))
