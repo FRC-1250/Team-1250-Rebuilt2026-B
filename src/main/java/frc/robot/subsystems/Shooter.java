@@ -6,10 +6,12 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Hertz;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -40,7 +42,7 @@ public class Shooter extends SubsystemBase {
     private final TalonFX shooterFollower = new TalonFX(61);
     private final TalonFX shooterLeader = new TalonFX(11);
     private final Follower followerControl = new Follower(shooterFollower.getDeviceID(), MotorAlignmentValue.Opposed);
-    private final VelocityVoltage velocityControl = new VelocityVoltage(0).withSlot(0);
+    private final MotionMagicVelocityVoltage velocityControl = new MotionMagicVelocityVoltage(0).withSlot(0);
     private final double CLOSED_LOOP_TOLERANCE = 5;
 
     public Shooter() {
@@ -55,11 +57,16 @@ public class Shooter extends SubsystemBase {
                 .withKI(0)
                 .withKD(0.01);
 
+        MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
+        motionMagicConfigs.MotionMagicAcceleration = 120;
+        motionMagicConfigs.MotionMagicJerk = 600;
+
         TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
         talonFXConfiguration.Slot0 = velocityGains;
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = 50;
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
+        talonFXConfiguration.MotionMagic = motionMagicConfigs;
 
         shooterFollower.getConfigurator().apply(talonFXConfiguration);
         shooterFollower.getVelocity().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
