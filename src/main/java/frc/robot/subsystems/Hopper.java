@@ -31,8 +31,8 @@ public class Hopper extends SubsystemBase {
     public enum HopperPosition {
         REVERSE_LIMIT(0),
         HOME(0.1),
-        DEPLOYED(14.9),
-        FORWARD_LIMIT(15);
+        DEPLOYED(15),
+        FORWARD_LIMIT(15.1);
 
         public double rotations;
 
@@ -78,9 +78,9 @@ public class Hopper extends SubsystemBase {
         softwareLimitSwitchConfigs.ReverseSoftLimitThreshold = HopperPosition.REVERSE_LIMIT.rotations;
 
         MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
-        motionMagicConfigs.MotionMagicCruiseVelocity = 24;
-        motionMagicConfigs.MotionMagicAcceleration = 64;
-        motionMagicConfigs.MotionMagicJerk = 256;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 20;
+        motionMagicConfigs.MotionMagicAcceleration = 60;
+        motionMagicConfigs.MotionMagicJerk = 180;
 
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
         talonFXConfiguration.Slot0 = positionGains;
