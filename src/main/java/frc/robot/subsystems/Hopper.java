@@ -21,7 +21,6 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Frequency;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,7 +42,6 @@ public class Hopper extends SubsystemBase {
     }
 
     private final TalonFX motor = new TalonFX(8);
-    private final DigitalInput homeMagSensor = new DigitalInput(1);
     private final PositionVoltage positionControl = new PositionVoltage(0).withSlot(0);
     private final double CLOSED_LOOP_TOLERANCE = 0.0;
 
@@ -93,6 +91,7 @@ public class Hopper extends SubsystemBase {
         motor.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
         SmartDashboard.putData("Reset hopper position (deployed)", cmdResetMotorDeployedPosition());
         SmartDashboard.putData("Reset hopper position (home)", cmdResetMotorHomePosition());
+        SmartDashboard.putData("Reset hopper position by amps (home)", cmdResetMotorPositionByAmps());
     }
 
     public void setMotorPosition(double rotations) {
@@ -109,6 +108,10 @@ public class Hopper extends SubsystemBase {
 
     public boolean isMotorAtPosition(double rotations) {
         return motor.getPosition().isNear(rotations, CLOSED_LOOP_TOLERANCE);
+    }
+
+    public boolean isMotorCurrentAbove(double amps) {
+        return getMotorStatorCurrent() >= amps;
     }
 
     public Command cmdSetMotorPosition(double rotations) {
@@ -135,17 +138,12 @@ public class Hopper extends SubsystemBase {
         }).ignoringDisable(true);
     }
 
-    public Command cmdResetMotorPositionWithSensor() {
+    public Command cmdResetMotorPositionByAmps() {
         return Commands.sequence(
                 Commands.runOnce(() -> motor.set(-0.2), this),
-                Commands.waitUntil(() -> getSensorState()),
+                Commands.waitUntil(() -> isMotorCurrentAbove(40)),
                 Commands.runOnce(() -> setPosition(HopperPosition.REVERSE_LIMIT.rotations)),
                 Commands.runOnce(() -> setMotorPosition(HopperPosition.HOME.rotations)));
-    }
-
-    @Logged(name = "Sensor state")
-    public boolean getSensorState() {
-        return homeMagSensor.get();
     }
 
     @Logged(name = "Motor Position")
