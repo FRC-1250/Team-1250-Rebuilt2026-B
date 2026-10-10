@@ -311,9 +311,8 @@ public class RobotContainer {
 
     private void configureNamedCommands() {
         NamedCommands.registerCommand("FireFuel",
-                commandFactory.cmdFireFuel(
-                        ShooterVelocity.SHOOT).withTimeout(3)
-                        .andThen(hood.cmdSetMotorPosition(HoodPosition.HOME)));
+                commandFactory.cmdFireFuel(ShooterVelocity.SHOOT).withTimeout(3)
+                        .andThen(commandFactory.cmdStopFireFuel()));
 
         NamedCommands.registerCommand("FireFuelByDistance",
                 commandFactory.cmdFireFuel(
