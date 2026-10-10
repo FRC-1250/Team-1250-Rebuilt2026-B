@@ -72,7 +72,7 @@ public class Hopper extends SubsystemBase {
         SoftwareLimitSwitchConfigs softwareLimitSwitchConfigs = new SoftwareLimitSwitchConfigs();
         softwareLimitSwitchConfigs.ForwardSoftLimitEnable = true;
         softwareLimitSwitchConfigs.ForwardSoftLimitThreshold = HopperPosition.FORWARD_LIMIT.rotations;
-        softwareLimitSwitchConfigs.ReverseSoftLimitEnable = true;
+        softwareLimitSwitchConfigs.ReverseSoftLimitEnable = false;
         softwareLimitSwitchConfigs.ReverseSoftLimitThreshold = HopperPosition.REVERSE_LIMIT.rotations;
 
         MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();

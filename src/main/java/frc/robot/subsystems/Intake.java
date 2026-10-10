@@ -40,7 +40,7 @@ public class Intake extends SubsystemBase {
     private final TalonFX leftMotor = new TalonFX(15);
     private final Follower followerControl = new Follower(leftMotor.getDeviceID(), MotorAlignmentValue.Opposed);
     private final MotionMagicVelocityVoltage velocityControl = new MotionMagicVelocityVoltage(0).withSlot(0);
-    private final double CLOSED_LOOP_TOLERANCE = 0.0;
+    private final double CLOSED_LOOP_TOLERANCE = 5.0;
 
     public Intake() {
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
@@ -60,7 +60,7 @@ public class Intake extends SubsystemBase {
 
         TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
         talonFXConfiguration.Slot0 = velocityGains;
-        talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = 50;
+        talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = 40;
         talonFXConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
         talonFXConfiguration.MotionMagic = motionMagicConfigs;
