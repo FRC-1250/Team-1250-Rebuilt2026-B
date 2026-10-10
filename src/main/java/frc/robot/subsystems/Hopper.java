@@ -22,6 +22,7 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -90,6 +91,8 @@ public class Hopper extends SubsystemBase {
         motor.getConfigurator().apply(talonFXConfiguration);
         motor.setPosition(0);
         motor.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        SmartDashboard.putData("Reset hopper position (deployed)", cmdSetMotorPosition(HopperPosition.FORWARD_LIMIT));
+        SmartDashboard.putData("Reset hopper position (home)", cmdSetMotorPosition(HopperPosition.REVERSE_LIMIT));
     }
 
     public void setMotorPosition(double rotations) {
