@@ -91,11 +91,14 @@ public class Hopper extends SubsystemBase {
         motor.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
         SmartDashboard.putData("Reset hopper position (deployed)", cmdResetMotorDeployedPosition());
         SmartDashboard.putData("Reset hopper position (home)", cmdResetMotorHomePosition());
-        SmartDashboard.putData("Reset hopper position by amps (home)", cmdResetMotorPositionByAmps());
     }
 
     public void setMotorPosition(double rotations) {
         motor.setControl(positionControl.withPosition(rotations));
+    }
+
+    public void setMotorPercentOut(double percentOut) {
+        motor.set(percentOut);
     }
 
     public void setPosition(double rotations) {
