@@ -79,8 +79,8 @@ public class Hopper extends SubsystemBase {
 
         MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
         motionMagicConfigs.MotionMagicCruiseVelocity = 20;
-        motionMagicConfigs.MotionMagicAcceleration = 60;
-        motionMagicConfigs.MotionMagicJerk = 180;
+        motionMagicConfigs.MotionMagicAcceleration = 40;
+        motionMagicConfigs.MotionMagicJerk = 120;
 
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
         talonFXConfiguration.Slot0 = positionGains;
