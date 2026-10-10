@@ -59,7 +59,7 @@ public class RobotContainer {
     @Logged(name = "Shooter")
     private final Shooter shooter = new Shooter();
 
-    @Logged(name = "Hood")
+    // @Logged(name = "Hood")
     private final Hood hood = new Hood();
 
     @Logged(name = "Loader")
