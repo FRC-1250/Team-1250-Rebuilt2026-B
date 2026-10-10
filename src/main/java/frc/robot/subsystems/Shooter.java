@@ -58,8 +58,8 @@ public class Shooter extends SubsystemBase {
                 .withKD(0.01);
 
         MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
-        motionMagicConfigs.MotionMagicAcceleration = 120;
-        motionMagicConfigs.MotionMagicJerk = 600;
+        motionMagicConfigs.MotionMagicAcceleration = 108;
+        motionMagicConfigs.MotionMagicJerk = 540;
 
         TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
         talonFXConfiguration.Slot0 = velocityGains;
