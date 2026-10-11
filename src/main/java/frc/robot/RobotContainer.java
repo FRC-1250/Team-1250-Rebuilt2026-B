@@ -325,6 +325,6 @@ public class RobotContainer {
         NamedCommands.registerCommand("CollectFuel", commandFactory.cmdCollectFuel());
 
         NamedCommands.registerCommand("WarmShooter",
-                shooter.cmdSetMotorVelocity(ShooterVelocity.WARM));
+                shooter.cmdSetMotorVelocity(ShooterVelocity.SHOOT));
     }
 }

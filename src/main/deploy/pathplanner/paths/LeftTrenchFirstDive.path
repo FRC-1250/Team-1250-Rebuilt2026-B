@@ -48,16 +48,16 @@
     },
     {
       "anchor": {
-        "x": 6.251738410599505,
-        "y": 5.777384105955157
+        "x": 7.137450331125828,
+        "y": 5.683004966887417
       },
       "prevControl": {
-        "x": 6.317113370553009,
-        "y": 5.025572066489866
+        "x": 7.202825291079332,
+        "y": 4.931192927422126
       },
       "nextControl": {
-        "x": 6.179139072851161,
-        "y": 6.612276490061117
+        "x": 7.064850993377484,
+        "y": 6.517897350993376
       },
       "isLocked": false,
       "linkedName": null
@@ -87,25 +87,9 @@
         "x": 5.65,
         "y": 7.45
       },
-      "nextControl": {
-        "x": 3.1500000000000004,
-        "y": 7.45
-      },
-      "isLocked": false,
-      "linkedName": "LeftTrench"
-    },
-    {
-      "anchor": {
-        "x": 3.0302728351126933,
-        "y": 5.084
-      },
-      "prevControl": {
-        "x": 2.3832779001675255,
-        "y": 6.976458071967592
-      },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LeftFiringPosition"
+      "linkedName": "LeftTrench"
     }
   ],
   "rotationTargets": [
@@ -122,7 +106,7 @@
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 5.1,
+      "waypointRelativePos": 5,
       "rotationDegrees": 0.0
     }
   ],
@@ -139,17 +123,6 @@
           "name": "CollectFuel"
         }
       }
-    },
-    {
-      "name": "WarmShooter",
-      "waypointRelativePos": 2.5,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "WarmShooter"
-        }
-      }
     }
   ],
   "globalConstraints": {
@@ -161,8 +134,8 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 145.0
+    "velocity": 1.5,
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,
