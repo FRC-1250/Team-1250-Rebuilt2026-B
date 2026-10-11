@@ -1,8 +1,21 @@
 package frc.robot.utility;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class FieldLocalization {
+    public enum ShootingLocation {
+        LEFT(new Pose2d(3.030, 5.084, Rotation2d.fromDegrees(145))),
+        RIGHT(new Pose2d(3.030, 3.126, Rotation2d.fromDegrees(-145)));
+
+        public final Pose2d pose;
+
+        ShootingLocation(Pose2d pose) {
+            this.pose = pose;
+        }
+    }
+
     public enum Landmark {
         BLUE_HUB(new Translation2d(4.605909, 4.027932)),
         BLUE_DEPOT(new Translation2d(1.45, 6.7)),

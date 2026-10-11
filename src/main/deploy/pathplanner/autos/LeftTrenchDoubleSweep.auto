@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "LeftTrenchToLeftFire"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "FireFuel"
@@ -19,7 +25,19 @@
         {
           "type": "path",
           "data": {
+            "pathName": "LeftFireToLeftTrench"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
             "pathName": "LeftTrenchSecondDive"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftTrenchToLeftFire"
           }
         },
         {

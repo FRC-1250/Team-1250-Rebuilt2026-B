@@ -21,7 +21,7 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Frequency;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,8 +30,8 @@ public class Hopper extends SubsystemBase {
     public enum HopperPosition {
         REVERSE_LIMIT(0),
         HOME(0.1),
-        DEPLOYED(14.9),
-        FORWARD_LIMIT(15);
+        DEPLOYED(15.1),
+        FORWARD_LIMIT(15.15);
 
         public double rotations;
 
@@ -42,7 +42,6 @@ public class Hopper extends SubsystemBase {
     }
 
     private final TalonFX motor = new TalonFX(8);
-    private final DigitalInput homeMagSensor = new DigitalInput(1);
     private final PositionVoltage positionControl = new PositionVoltage(0).withSlot(0);
     private final double CLOSED_LOOP_TOLERANCE = 0.0;
 
@@ -58,9 +57,9 @@ public class Hopper extends SubsystemBase {
         Slot0Configs positionGains = new Slot0Configs();
         positionGains.GravityType = GravityTypeValue.Elevator_Static;
         positionGains.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
-        positionGains.kS = 0.4; // output to overcome static friction (output)
+        positionGains.kS = 0.9; // output to overcome static friction (output)
         positionGains.kV = 0.15; // output per unit of target velocity (output/rps)
-        positionGains.kG = 0.7;
+        positionGains.kG = 1.2;
         positionGains.kA = 0; // output per unit of target acceleration (output/(rps/s))
         positionGains.kP = 2; // output per unit of error in position (output/rotation)
         positionGains.kI = 0; // output per unit of integrated error in position (output/(rotation*s))
@@ -73,13 +72,13 @@ public class Hopper extends SubsystemBase {
         SoftwareLimitSwitchConfigs softwareLimitSwitchConfigs = new SoftwareLimitSwitchConfigs();
         softwareLimitSwitchConfigs.ForwardSoftLimitEnable = true;
         softwareLimitSwitchConfigs.ForwardSoftLimitThreshold = HopperPosition.FORWARD_LIMIT.rotations;
-        softwareLimitSwitchConfigs.ReverseSoftLimitEnable = true;
+        softwareLimitSwitchConfigs.ReverseSoftLimitEnable = false;
         softwareLimitSwitchConfigs.ReverseSoftLimitThreshold = HopperPosition.REVERSE_LIMIT.rotations;
 
         MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
-        motionMagicConfigs.MotionMagicCruiseVelocity = 24;
-        motionMagicConfigs.MotionMagicAcceleration = 64;
-        motionMagicConfigs.MotionMagicAcceleration = 256;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 20;
+        motionMagicConfigs.MotionMagicAcceleration = 40;
+        motionMagicConfigs.MotionMagicJerk = 120;
 
         talonFXConfiguration.MotorOutput = motorOutputConfigs;
         talonFXConfiguration.Slot0 = positionGains;
@@ -90,10 +89,16 @@ public class Hopper extends SubsystemBase {
         motor.getConfigurator().apply(talonFXConfiguration);
         motor.setPosition(0);
         motor.getPosition().setUpdateFrequency(Frequency.ofBaseUnits(100, Hertz));
+        SmartDashboard.putData("Reset hopper position (deployed)", cmdResetMotorDeployedPosition());
+        SmartDashboard.putData("Reset hopper position (home)", cmdResetMotorHomePosition());
     }
 
     public void setMotorPosition(double rotations) {
         motor.setControl(positionControl.withPosition(rotations));
+    }
+
+    public void setMotorPercentOut(double percentOut) {
+        motor.set(percentOut);
     }
 
     public void setPosition(double rotations) {
@@ -108,6 +113,10 @@ public class Hopper extends SubsystemBase {
         return motor.getPosition().isNear(rotations, CLOSED_LOOP_TOLERANCE);
     }
 
+    public boolean isMotorCurrentAbove(double amps) {
+        return getMotorStatorCurrent() >= amps;
+    }
+
     public Command cmdSetMotorPosition(double rotations) {
         return Commands.runOnce(() -> setMotorPosition(rotations), this).until(() -> isMotorAtPosition(rotations));
     }
@@ -120,23 +129,24 @@ public class Hopper extends SubsystemBase {
         return Commands.runOnce(() -> stopMotor(), this);
     }
 
-    public Command cmdResetMotorPosition() {
+    public Command cmdResetMotorHomePosition() {
         return Commands.runOnce(() -> {
-            this.setPosition(0);
+            this.setPosition(HopperPosition.REVERSE_LIMIT.rotations);
         }).ignoringDisable(true);
     }
 
-    public Command cmdResetMotorPositionWithSensor() {
-        return Commands.sequence(
-                Commands.runOnce(() -> motor.set(-0.2), this),
-                Commands.waitUntil(() -> getSensorState()),
-                Commands.runOnce(() -> setPosition(HopperPosition.REVERSE_LIMIT.rotations)),
-                Commands.runOnce(() -> setMotorPosition(HopperPosition.HOME.rotations)));
+    public Command cmdResetMotorDeployedPosition() {
+        return Commands.runOnce(() -> {
+            this.setPosition(HopperPosition.FORWARD_LIMIT.rotations);
+        }).ignoringDisable(true);
     }
 
-    @Logged(name = "Sensor state")
-    public boolean getSensorState() {
-        return homeMagSensor.get();
+    public Command cmdResetMotorPositionByAmps() {
+        return Commands.sequence(
+                Commands.runOnce(() -> motor.set(-0.2), this),
+                Commands.waitUntil(() -> isMotorCurrentAbove(40)),
+                Commands.runOnce(() -> setPosition(HopperPosition.REVERSE_LIMIT.rotations)),
+                Commands.runOnce(() -> setMotorPosition(HopperPosition.HOME.rotations)));
     }
 
     @Logged(name = "Motor Position")

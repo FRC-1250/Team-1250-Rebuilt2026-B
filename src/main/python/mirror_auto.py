@@ -7,7 +7,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_PP_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, '..', 'deploy', 'pathplanner'))
 AUTO_DIR = os.path.join(BASE_PP_DIR, 'autos')
 PATH_DIR = os.path.join(BASE_PP_DIR, 'paths')
-FIELD_WIDTH = 8.21
+FIELD_WIDTH = 8.069336
 
 def swap_side_string(text, direction):
     """

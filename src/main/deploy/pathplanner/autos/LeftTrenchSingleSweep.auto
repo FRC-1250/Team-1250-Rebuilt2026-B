@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "LeftTrenchToLeftFire"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "FireFuel"
