@@ -96,11 +96,11 @@ public class CommandFactory {
     }
 
     public Command cmdStopFireFuel() {
-        return Commands.run(() -> {
-            shooter.stopMotor();
-            loader.stopMotor();
-            indexer.stopMotor();
-        }, shooter, loader, indexer);
+        return Commands.parallel(
+                hood.cmdSetMotorPosition(HoodPosition.HOME),
+                loader.cmdStopMotor(),
+                shooter.cmdStopMotor(),
+                indexer.cmdStopMotor());
     }
 
     public Command cmdCollectFuel() {

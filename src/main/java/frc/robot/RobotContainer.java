@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -93,30 +92,12 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry();
 
-    private final double SHIFT_CLOCK_WARNING = 8.0;
-    private final double SHIFT_CLOCK_PRE_FIRE = 2.0;
     private double timeLeftInShift = 0;
     private Shift shift = Shift.AUTO;
     private Optional<Time> timeOpt;
     private Optional<Shift> shiftOpt;
 
     private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-
-    private final Trigger hubInactive = new Trigger(
-            () -> (timeLeftInShift > SHIFT_CLOCK_WARNING
-                    && !HubTracker.isActive()));
-
-    private final Trigger hubActiveSoon = new Trigger(
-            () -> (timeLeftInShift <= SHIFT_CLOCK_WARNING
-                    && timeLeftInShift > SHIFT_CLOCK_PRE_FIRE
-                    && !HubTracker.isActive()));
-
-    private final Trigger hubActivePreFire = new Trigger(
-            () -> (timeLeftInShift <= SHIFT_CLOCK_PRE_FIRE
-                    && !HubTracker.isActive()));
-
-    private final Trigger hubActive = new Trigger(
-            () -> HubTracker.isActive());
 
     private final Trigger robotIsAligned = new Trigger(() -> targetManager.getTargetingState().isAligned());
 
@@ -208,13 +189,20 @@ public class RobotContainer {
 
         primary.start().onTrue(swerve.runOnce(() -> swerve.seedFieldCentric()).withName("Seed field centric"));
 
-        primary.rightTrigger()
+        primary.rightTrigger().and(primary.leftTrigger().negate())
                 .whileTrue(commandFactory.cmdFireFuel(
-                        ShooterVelocity.SHOOT)
-                        .withName("Shoot default"));
-        primary.rightTrigger()
-                .whileFalse(commandFactory.cmdStopFireFuel()
-                        .withName("Shoot Stop"));
+                        ShooterVelocity.SHOOT,
+                        HoodPosition.ALLIANCE_ZONE)
+                        .withName("Shoot default"))
+                .onFalse((commandFactory.cmdStopFireFuel()
+                        .withName("Shoot Stop")));
+
+        primary.rightTrigger().and(primary.leftTrigger()).and(robotIsAligned)
+                .whileTrue(commandFactory.cmdFireFuel(
+                        () -> getVelocityBasedOnTargetDistance(),
+                        () -> getHoodPositionBasedOnZone().rotations)
+                        .withName("Shoot by distance"));
+
         primary.leftTrigger().whileTrue(
                 swerve.applyRequest(
                         () -> driveWithAngle
@@ -304,8 +292,10 @@ public class RobotContainer {
          */
         autoChooser.setDefaultOption("Do nothing", new WaitCommand(15));
         addPathAuto("LeftTrenchSingleSweep", "LeftTrenchSingleSweep");
-        addPathAuto("LeftTrenchSweep+Depot", "LeftTrenchSweep+Depot");
+        addPathAuto("LeftTrenchSingleSweepAndDepot", "LeftTrenchSingleSweepAndDepot");
+        addPathAuto("LeftTrenchDoubleSweep", "LeftTrenchDoubleSweep");
         addPathAuto("RightTrenchSingleSweep", "RightTrenchSingleSweep");
+        addPathAuto("RightTrenchDoubleSweep", "RightTrenchDoubleSweep");
         addPathAuto("CenterDepotOutpost", "CenterDepotOutpost");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -313,14 +303,16 @@ public class RobotContainer {
 
     private void configureNamedCommands() {
         NamedCommands.registerCommand("FireFuel",
-                commandFactory.cmdFireFuel(ShooterVelocity.SHOOT).withTimeout(4)
+                commandFactory.cmdFireFuel(
+                        ShooterVelocity.SHOOT,
+                        HoodPosition.ALLIANCE_ZONE).withTimeout(4)
                         .andThen(commandFactory.cmdStopFireFuel()));
 
         NamedCommands.registerCommand("FireFuelByDistance",
                 commandFactory.cmdFireFuel(
                         () -> getVelocityBasedOnTargetDistance(),
-                        () -> getHoodPositionBasedOnZone().rotations).withTimeout(3)
-                        .andThen(hood.cmdSetMotorPosition(HoodPosition.HOME)));
+                        () -> getHoodPositionBasedOnZone().rotations).withTimeout(4)
+                        .andThen(commandFactory.cmdStopFireFuel()));
 
         NamedCommands.registerCommand("CollectFuel", commandFactory.cmdCollectFuel());
 
