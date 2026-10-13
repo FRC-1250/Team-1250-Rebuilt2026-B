@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Telemetry {
     public Telemetry() {
-        SignalLogger.start();
-        SignalLogger.enableAutoLogging(true);
+        // SignalLogger.start();
+        // SignalLogger.enableAutoLogging(true);
     }
 
     /* What to publish over networktables for telemetry */

@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import java.util.List;
 import java.util.Optional;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentric;
 import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentricFacingAngle;
@@ -33,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
@@ -189,90 +191,19 @@ public class RobotContainer {
 
         primary.start().onTrue(swerve.runOnce(() -> swerve.seedFieldCentric()).withName("Seed field centric"));
 
-        primary.rightTrigger().and(primary.leftTrigger().negate())
-                .whileTrue(commandFactory.cmdFireFuel(
-                        ShooterVelocity.SHOOT,
-                        HoodPosition.ALLIANCE_ZONE)
-                        .withName("Shoot default"))
-                .onFalse((commandFactory.cmdStopFireFuel()
-                        .withName("Shoot Stop")));
+        primary.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+        primary.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
 
-        primary.rightTrigger().and(primary.leftTrigger()).and(robotIsAligned)
-                .whileTrue(commandFactory.cmdFireFuel(
-                        () -> getVelocityBasedOnTargetDistance(),
-                        () -> getHoodPositionBasedOnZone().rotations)
-                        .withName("Shoot by distance"));
-
-        primary.leftTrigger().whileTrue(
-                swerve.applyRequest(
-                        () -> driveWithAngle
-                                .withVelocityX(yLimiter.calculate(-primary.getLeftY() * (MaxSpeed * 0.5)))
-                                .withVelocityY(xLimiter.calculate(-primary.getLeftX() * (MaxSpeed * 0.5)))
-                                .withHeadingPID(15, 0, 0)
-                                .withTargetDirection(getRotationToTargetBasedOnZone()))
-                        .withName("Field centric facing angle"));
-
-        primary.leftTrigger().and(robotInRange)
-                .onTrue(Commands.runOnce(() -> primary.setRumble(RumbleType.kBothRumble,
-                        0.3)).withName("Rumble on"))
-                .onFalse(Commands.runOnce(() -> primary.setRumble(RumbleType.kBothRumble,
-                        0)).withName("Rubmle off"));
-
-        primary.b().whileTrue(
-                swerve.applyRequest(
-                        () -> driveWithAngle
-                                .withVelocityX(yLimiter.calculate(-primary.getLeftY() * (MaxSpeed * 0.33)))
-                                .withVelocityY(xLimiter.calculate(-primary.getLeftX() * (MaxSpeed * 0.33)))
-                                .withHeadingPID(15, 0, 0)
-                                .withTargetDirection(swerve.getOperatorForwardDirection().plus(Rotation2d.k180deg)))
-                        .withName("Snap backwards"));
-
-        primary.a().whileTrue(
-                swerve.applyRequest(
-                        () -> driveWithAngle
-                                .withVelocityX(yLimiter.calculate(-primary.getLeftY() * (MaxSpeed * 0.33)))
-                                .withVelocityY(xLimiter.calculate(-primary.getLeftX() * (MaxSpeed * 0.33)))
-                                .withHeadingPID(15, 0, 0)
-                                .withTargetDirection(swerve.getOperatorForwardDirection()))
-                        .withName("Snap forward"));
-
-        primary.x().whileTrue(
-                Commands.sequence(
-                        Commands.either(
-                                commandFactory.cmdPathFindToPose(ShootingLocation.LEFT.pose),
-                                commandFactory.cmdPathFindToPose(ShootingLocation.RIGHT.pose),
-                                () -> {
-                                    var pose = swerve.getState().Pose;
-                                    var leftDiff = ShootingLocation.LEFT.pose.getTranslation()
-                                            .getDistance(pose.getTranslation());
-                                    var rightDiff = ShootingLocation.RIGHT.pose.getTranslation()
-                                            .getDistance(pose.getTranslation());
-
-                                    // When PathPlanner flips the point, it does so by mirroring it over the Y axis.
-                                    // So left becomes right and right becomes left on the red side.
-                                    // Flipping the conditional for red allows for "left" to still be on the left
-                                    // side of the field.
-                                    // TODO: A map similar to what is used in the ShooterStrategyManager would work
-                                    // better for this.
-
-                                    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-                                        return leftDiff > rightDiff;
-                                    } else {
-                                        return leftDiff < rightDiff;
-                                    }
-                                }),
-                        swerve.applyRequest(
-                                () -> driveWithAngle
-                                        .withVelocityX(0)
-                                        .withVelocityY(0)
-                                        .withHeadingPID(15, 0, 0)
-                                        .withTargetDirection(getRotationToTargetBasedOnZone()))
-                                .withTimeout(0.5)
-                                .withName("Field centric facing angle")));
-
-        primary.rightBumper().onTrue(commandFactory.cmdCollectFuel().withName("Collect fuel"));
-        primary.leftBumper().onTrue(commandFactory.cmdResetMotorPositionByAmps().withName("Stop collect fuel"));
-        SmartDashboard.putData("Reset hopper position by amps (home)", commandFactory.cmdResetMotorPositionByAmps());
+        /*
+         * Joystick Y = quasistatic forward
+         * Joystick A = quasistatic reverse
+         * Joystick B = dynamic forward
+         * Joystick X = dyanmic reverse
+         */
+        primary.povUp().whileTrue(swerve.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        primary.povDown().whileTrue(swerve.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        primary.povLeft().whileTrue(swerve.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        primary.povRight().whileTrue(swerve.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     }
 
     private void addPathAuto(String name, String pathName) {
