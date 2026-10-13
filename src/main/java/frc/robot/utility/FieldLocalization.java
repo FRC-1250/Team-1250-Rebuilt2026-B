@@ -58,7 +58,10 @@ public class FieldLocalization {
                         16.4592,
                         11.8618,
                         8.2296,
-                        0.0));
+                        0.0)),
+        BLUE_HUB_RANGE(new FieldZoneRectangle(3.5, 2.9, 3.5, 4.5)),
+
+        RED_HUB_RANGE(new FieldZoneRectangle(13.6, 12.5, 4.5, 3.5));
 
         public final FieldZone area;
 
