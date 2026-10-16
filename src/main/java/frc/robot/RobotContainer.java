@@ -191,19 +191,10 @@ public class RobotContainer {
 
         primary.start().onTrue(swerve.runOnce(() -> swerve.seedFieldCentric()).withName("Seed field centric"));
 
-        primary.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
-        primary.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
-
-        /*
-         * Joystick Y = quasistatic forward
-         * Joystick A = quasistatic reverse
-         * Joystick B = dynamic forward
-         * Joystick X = dyanmic reverse
-         */
-        primary.povUp().whileTrue(swerve.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        primary.povDown().whileTrue(swerve.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        primary.povLeft().whileTrue(swerve.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        primary.povRight().whileTrue(swerve.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        primary.y().whileTrue(swerve.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        primary.a().whileTrue(swerve.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        primary.b().whileTrue(swerve.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        primary.x().whileTrue(swerve.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     }
 
     private void addPathAuto(String name, String pathName) {
