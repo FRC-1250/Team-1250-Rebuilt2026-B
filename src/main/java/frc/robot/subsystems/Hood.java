@@ -28,7 +28,7 @@ public class Hood extends SubsystemBase {
         ALLIANCE_ZONE(0.274),
         NEUTRAL_ZONE(0.274),
         OPPOSSING_ALLIANCE_ZONE(0.274),
-        FORWARD_LIMIT(.334);
+        FORWARD_LIMIT(0.4);
 
         public double rotations;
         public double angle;
@@ -42,7 +42,7 @@ public class Hood extends SubsystemBase {
     private final TalonFX motor = new TalonFX(35);
     private final CANcoder cancoder = new CANcoder(36);
     private final PositionVoltage positionControl = new PositionVoltage(0).withSlot(0);
-    private final double MAGNET_OFFSET = 0.2;
+    private final double MAGNET_OFFSET = -0.043;
     private final double CLOSED_LOOP_TOLERANCE = 0.5;
 
     public Hood() {
