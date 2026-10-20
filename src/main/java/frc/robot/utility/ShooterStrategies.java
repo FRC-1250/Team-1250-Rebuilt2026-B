@@ -60,5 +60,22 @@ public class ShooterStrategies {
                         Landmark.BLUE_OUTPOST,
                         HoodPosition.NEUTRAL_ZONE,
                         20));
+
+        strategies.add(
+                new ShooterStrategy(
+                        Alliance.Blue,
+                        Zone.BLUE_HUB_RANGE,
+                        Landmark.BLUE_HUB,
+                        HoodPosition.HOME,
+                        13));
+
+        strategies.add(
+                new ShooterStrategy(
+                        Alliance.Red,
+                        Zone.RED_HUB_RANGE,
+                        Landmark.RED_HUB,
+                        HoodPosition.HOME,
+                        13));
+
     }
 }
