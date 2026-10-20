@@ -50,7 +50,7 @@ public class Hood extends SubsystemBase {
 
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
         motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
-        motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
+        motorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
 
         Slot0Configs positionGains = new Slot0Configs()
                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
