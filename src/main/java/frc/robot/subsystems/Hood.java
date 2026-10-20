@@ -29,7 +29,7 @@ public class Hood extends SubsystemBase {
         ALLIANCE_ZONE_1_1(.2),
         NEUTRAL_ZONE(0.274),
         OPPOSSING_ALLIANCE_ZONE(0.274),
-        FORWARD_LIMIT(0.4);
+        FORWARD_LIMIT(0.334);
 
         public double rotations;
         public double angle;
@@ -44,18 +44,18 @@ public class Hood extends SubsystemBase {
     private final CANcoder cancoder = new CANcoder(36);
     private final PositionVoltage positionControl = new PositionVoltage(0).withSlot(0);
     private final double MAGNET_OFFSET = -0.043;
-    private final double CLOSED_LOOP_TOLERANCE = 0.5;
+    private final double CLOSED_LOOP_TOLERANCE = 0.05;
 
     public Hood() {
         TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
 
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
         motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
-        motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
+        motorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
 
         Slot0Configs positionGains = new Slot0Configs()
                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
-                .withKS(0.25)
+                .withKS(0.5)
                 .withKP(8)
                 .withKI(0)
                 .withKD(0.01);
