@@ -26,6 +26,7 @@ public class Hood extends SubsystemBase {
         REVERSE_LIMIT(.248),
         HOME(0.254),
         ALLIANCE_ZONE(0.274),
+        ALLIANCE_ZONE_1_1(.2),
         NEUTRAL_ZONE(0.274),
         OPPOSSING_ALLIANCE_ZONE(0.274),
         FORWARD_LIMIT(0.4);
@@ -35,7 +36,7 @@ public class Hood extends SubsystemBase {
 
         private HoodPosition(double rotations) {
             this.rotations = rotations;
-            this.angle = rotations; // TODO: Find math function for this
+            this.angle = (366.2821 * rotations) - 84.9592;
         }
     }
 
@@ -50,7 +51,7 @@ public class Hood extends SubsystemBase {
 
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
         motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
-        motorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
+        motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
 
         Slot0Configs positionGains = new Slot0Configs()
                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
