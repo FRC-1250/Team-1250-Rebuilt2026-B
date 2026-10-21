@@ -193,15 +193,16 @@ public class RobotContainer {
                 .whileTrue(commandFactory.cmdFireFuel(
                         ShooterVelocity.SHOOT,
                         HoodPosition.ALLIANCE_ZONE)
-                        .withName("Shoot default"))
-                .onFalse((commandFactory.cmdStopFireFuel()
-                        .withName("Shoot Stop")));
+                        .withName("Shoot default"));
 
         primary.rightTrigger().and(primary.leftTrigger()).and(robotIsAligned)
                 .whileTrue(commandFactory.cmdFireFuel(
                         () -> getVelocityBasedOnTargetDistance(),
                         () -> getHoodPositionBasedOnZone().rotations)
                         .withName("Shoot by distance"));
+
+        primary.rightTrigger().onFalse((commandFactory.cmdStopFireFuel()
+                .withName("Shoot Stop")));
 
         primary.leftTrigger().whileTrue(
                 swerve.applyRequest(
