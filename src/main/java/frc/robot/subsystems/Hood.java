@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Hertz;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -23,12 +24,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hood extends SubsystemBase {
     public enum HoodPosition {
-        REVERSE_LIMIT(.248),
+        REVERSE_LIMIT(0.248),
         HOME(0.254),
-        ALLIANCE_ZONE(0.274),
-        ALLIANCE_ZONE_1_1(.2),
-        NEUTRAL_ZONE(0.274),
-        OPPOSSING_ALLIANCE_ZONE(0.274),
+        ALLIANCE_ZONE(0.2784),
+        NEUTRAL_ZONE(0.3275),
+        OPPOSSING_ALLIANCE_ZONE(0.3275),
         FORWARD_LIMIT(0.334);
 
         public double rotations;
@@ -53,10 +53,16 @@ public class Hood extends SubsystemBase {
         motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
         motorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
 
+        SoftwareLimitSwitchConfigs softwareLimitSwitchConfigs = new SoftwareLimitSwitchConfigs();
+        softwareLimitSwitchConfigs.ForwardSoftLimitEnable = true;
+        softwareLimitSwitchConfigs.ForwardSoftLimitThreshold = HoodPosition.FORWARD_LIMIT.rotations;
+        softwareLimitSwitchConfigs.ReverseSoftLimitEnable = true;
+        softwareLimitSwitchConfigs.ReverseSoftLimitThreshold = HoodPosition.REVERSE_LIMIT.rotations;
+
         Slot0Configs positionGains = new Slot0Configs()
                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
                 .withKS(0.5)
-                .withKP(8)
+                .withKP(15)
                 .withKI(0)
                 .withKD(0.01);
         talonFXConfiguration.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
