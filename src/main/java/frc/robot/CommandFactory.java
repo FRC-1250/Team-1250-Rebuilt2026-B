@@ -119,13 +119,19 @@ public class CommandFactory {
         return AutoBuilder.pathfindToPoseFlipped(targetPose, pathConstraints);
     }
 
-    public Command cmdResetMotorPositionByAmps() {
+    public Command cmdStopCollectFuelPercentOut() {
         return Commands.sequence(
                 intake.cmdStopMotor(),
-                Commands.waitUntil(() -> intake.isMotorAtVelocity(0)),
                 Commands.runOnce(() -> hopper.setMotorPercentOut(-0.3), hopper),
                 Commands.waitUntil(() -> hopper.isMotorCurrentAbove(40)),
-                Commands.runOnce(() -> hopper.setPosition(HopperPosition.REVERSE_LIMIT.rotations)),
-                Commands.runOnce(() -> hopper.setMotorPosition(HopperPosition.HOME.rotations)));
+                hopper.cmdHoldPosition());
+    }
+
+    public Command cmdStartCollectFuelPercentOut() {
+        return Commands.sequence(
+                Commands.runOnce(() -> hopper.setMotorPercentOut(0.2), hopper),
+                Commands.waitUntil(() -> hopper.isMotorCurrentAbove(40)),
+                hopper.cmdHoldPosition(),
+                intake.cmdSetMotorVelocity(IntakeVelocity.COLLECT));
     }
 }

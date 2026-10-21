@@ -271,9 +271,8 @@ public class RobotContainer {
                                 .withTimeout(0.5)
                                 .withName("Field centric facing angle")));
 
-        primary.rightBumper().onTrue(commandFactory.cmdCollectFuel().withName("Collect fuel"));
-        primary.leftBumper().onTrue(commandFactory.cmdResetMotorPositionByAmps().withName("Stop collect fuel"));
-        SmartDashboard.putData("Reset hopper position by amps (home)", commandFactory.cmdResetMotorPositionByAmps());
+        primary.rightBumper().onTrue(commandFactory.cmdStartCollectFuelPercentOut().withName("Collect fuel"));
+        primary.leftBumper().onTrue(commandFactory.cmdStopCollectFuelPercentOut().withName("Stop collect fuel"));
     }
 
     private void addPathAuto(String name, String pathName) {
