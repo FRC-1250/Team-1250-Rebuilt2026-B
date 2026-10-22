@@ -142,7 +142,7 @@ public class Hopper extends SubsystemBase {
     }
 
     public Command cmdHoldPosition() {
-        return cmdSetMotorPosition(motor.getPosition().getValueAsDouble());
+        return Commands.runOnce(() -> setMotorPosition(motor.getPosition().getValueAsDouble()));
     }
 
     public Command cmdResetMotorPositionByAmps() {
