@@ -33,6 +33,7 @@ public class RobotLocalization {
     private double frameRejectionRate = 0;
     private int teleportFrameCounter = 0;
     private double xTrust, yTrust = 10.0;
+    private double lastSeen = 0;
 
     private final double maxRadiansPerSecond = 2;
     private final double minAllowedViewableTagDecimal = 0.05; // 0 to 100 so 0.05 is 5%
@@ -60,11 +61,7 @@ public class RobotLocalization {
             limelight.setRobotOrientation(driveState.Pose.getRotation().getDegrees());
             PoseEstimate megaTag = limelight.getBotPoseEstimate_wpiBlue_MegaTag2();
             framesProcessed++;
-
-            if (reportTimer.advanceIfElapsed(5)) {
-                reportToNT();
-                reportTimer.reset();
-            }
+            limelight.sendSecondsSinceUpdateToPublisher(lastSeen);
 
             if (Math.abs(Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond)) > maxRadiansPerSecond)
                 continue;
@@ -91,7 +88,8 @@ public class RobotLocalization {
             }
 
             xTrust = yTrust = calculateTrust(megaTag);
-            limelight.getPosePublisher().set(megaTag.pose);
+            limelight.sendPoseToPublisher(megaTag.pose);
+            lastSeen = megaTag.timestampSeconds;
 
             if (limelight.getMode() == LimelightLocalizationMode.ENABLED) {
 
@@ -105,6 +103,12 @@ public class RobotLocalization {
             }
         }
 
+        if (!limelights.isEmpty()) {
+            if (reportTimer.advanceIfElapsed(5)) {
+                reportToNT();
+                reportTimer.reset();
+            }
+        }
     }
 
     private void reportToNT() {

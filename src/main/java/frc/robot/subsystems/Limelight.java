@@ -5,9 +5,11 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,6 +38,7 @@ public class Limelight extends SubsystemBase {
     private final String name;
     private final LimelightLocalizationMode mode;
     private final StructPublisher<Pose2d> llPosePublisher;
+    private final DoublePublisher llSecondsSinceUpdate;
     private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
     private final NetworkTable llTable = inst.getTable("Robot/RobotContainer/Limelight");
 
@@ -43,6 +46,7 @@ public class Limelight extends SubsystemBase {
         this.name = name;
         this.mode = mode;
         this.llPosePublisher = llTable.getStructTopic(name + " pose2d", Pose2d.struct).publish();
+        this.llSecondsSinceUpdate = llTable.getDoubleTopic(name + " time since update").publish();
     }
 
     public Limelight() {
@@ -79,8 +83,12 @@ public class Limelight extends SubsystemBase {
         return mode;
     }
 
-    public StructPublisher<Pose2d> getPosePublisher() {
-        return llPosePublisher;
+    public void sendPoseToPublisher(Pose2d pose2d) {
+        llPosePublisher.set(pose2d);
+    }
+
+    public void sendSecondsSinceUpdateToPublisher(double timestamp) {
+        llSecondsSinceUpdate.set(Timer.getFPGATimestamp() - timestamp);
     }
 
 }
