@@ -16,20 +16,17 @@ public class ShooterProjectileLookUp {
             HoodPosition.class);
 
     static {
-        add(HoodPosition.ALLIANCE_ZONE, Units.feetToMeters(4), 40);
-        add(HoodPosition.ALLIANCE_ZONE, Units.feetToMeters(6), 40);
-        add(HoodPosition.ALLIANCE_ZONE, Units.feetToMeters(8), 40);
-        add(HoodPosition.ALLIANCE_ZONE, Units.feetToMeters(10), 40);
+        add(HoodPosition.HOME, Units.feetToMeters(3), 50);
+        add(HoodPosition.HOME, Units.feetToMeters(5), 50);
 
-        add(HoodPosition.NEUTRAL_ZONE, Units.feetToMeters(4), 40);
-        add(HoodPosition.NEUTRAL_ZONE, Units.feetToMeters(6), 40);
-        add(HoodPosition.NEUTRAL_ZONE, Units.feetToMeters(8), 40);
-        add(HoodPosition.NEUTRAL_ZONE, Units.feetToMeters(10), 40);
+        add(HoodPosition.ALLIANCE_ZONE, Units.feetToMeters(5), 50);
+        add(HoodPosition.ALLIANCE_ZONE, Units.feetToMeters(15), 50);
 
-        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, Units.feetToMeters(4), 40);
-        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, Units.feetToMeters(6), 40);
-        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, Units.feetToMeters(8), 40);
-        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, Units.feetToMeters(10), 40);
+        add(HoodPosition.NEUTRAL_ZONE, Units.feetToMeters(15), 50);
+        add(HoodPosition.NEUTRAL_ZONE, Units.feetToMeters(39), 50);
+
+        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, Units.feetToMeters(39), 50);
+        add(HoodPosition.OPPOSSING_ALLIANCE_ZONE, Units.feetToMeters(54), 50);
     }
 
     private static void add(HoodPosition position, double distanceFromBumperMeters, double shooterVelocity) {
