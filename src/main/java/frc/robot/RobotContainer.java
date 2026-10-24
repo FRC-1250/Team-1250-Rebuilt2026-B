@@ -96,6 +96,8 @@ public class RobotContainer {
     private Shift shift = Shift.AUTO;
     private Optional<Time> timeOpt;
     private Optional<Shift> shiftOpt;
+    private boolean hopperExtended = false;
+    private Trigger hopperExtenedTrigger = new Trigger(() -> hopperExtended);
 
     private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
@@ -271,8 +273,11 @@ public class RobotContainer {
                                 .withName("Field centric facing angle")));
         primary.povDown().whileTrue(commandFactory.cmdOuttake()).onFalse(commandFactory.cmdHomeostasis());
 
-        primary.rightBumper().onTrue(commandFactory.cmdStartCollectFuelPercentOut().withName("Collect fuel"));
-        primary.leftBumper().onTrue(commandFactory.cmdStopCollectFuelPercentOut().withName("Stop collect fuel"));
+        primary.rightBumper().onTrue(commandFactory.cmdStartCollectFuelPercentOut().withName("Collect fuel")
+                .andThen(Commands.runOnce(() -> hopperExtended = true)));
+
+        primary.leftBumper().onTrue(commandFactory.cmdStopCollectFuelPercentOut().withName("Stop collect fuel")
+                .andThen(Commands.runOnce(() -> hopperExtended = false)));
     }
 
     private void addPathAuto(String name, String pathName) {
