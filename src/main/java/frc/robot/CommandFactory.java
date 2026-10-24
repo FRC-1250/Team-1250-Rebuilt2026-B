@@ -123,14 +123,14 @@ public class CommandFactory {
         return Commands.sequence(
                 intake.cmdStopMotor(),
                 Commands.runOnce(() -> hopper.setMotorPercentOut(-0.3), hopper),
-                Commands.waitUntil(() -> hopper.isMotorCurrentAbove(40)),
+                Commands.waitUntil(() -> hopper.isMotorCurrentAbove(40)).withTimeout(1.5),
                 hopper.cmdStopMotor());
     }
 
     public Command cmdStartCollectFuelPercentOut() {
         return Commands.sequence(
                 Commands.runOnce(() -> hopper.setMotorPercentOut(0.3), hopper),
-                Commands.waitUntil(() -> hopper.isMotorCurrentAbove(25)).withTimeout(1.5),
+                Commands.waitUntil(() -> hopper.isMotorCurrentAbove(40)).withTimeout(1.5),
                 hopper.cmdStopMotor(),
                 intake.cmdSetMotorVelocity(IntakeVelocity.COLLECT));
     }
@@ -138,7 +138,7 @@ public class CommandFactory {
     public Command cmdOuttake() {
         return Commands.sequence(
                 Commands.runOnce(() -> hopper.setMotorPercentOut(0.3), hopper),
-                Commands.waitUntil(() -> hopper.isMotorCurrentAbove(25)).withTimeout(1.5),
+                Commands.waitUntil(() -> hopper.isMotorCurrentAbove(40)).withTimeout(1.5),
                 hopper.cmdStopMotor(),
                 intake.cmdSetMotorVelocity(IntakeVelocity.UNJAM),
                 Commands.waitSeconds(1),
