@@ -26,7 +26,7 @@ public class Hood extends SubsystemBase {
     public enum HoodPosition {
         REVERSE_LIMIT(0.248),
         HOME(0.254),
-        ALLIANCE_ZONE(0.2784),
+        ALLIANCE_ZONE(0.2866),
         NEUTRAL_ZONE(0.3275),
         OPPOSSING_ALLIANCE_ZONE(0.3275),
         FORWARD_LIMIT(0.334);
@@ -61,10 +61,11 @@ public class Hood extends SubsystemBase {
 
         Slot0Configs positionGains = new Slot0Configs()
                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
-                .withKS(0.5)
+                .withKS(0.3)
+                .withKG(0.25)
                 .withKP(15)
                 .withKI(0)
-                .withKD(0.01);
+                .withKD(0.05);
         talonFXConfiguration.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
         talonFXConfiguration.Slot0 = positionGains;
         talonFXConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
