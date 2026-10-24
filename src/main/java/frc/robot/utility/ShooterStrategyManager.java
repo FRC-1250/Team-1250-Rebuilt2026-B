@@ -30,7 +30,7 @@ public class ShooterStrategyManager {
             0,
             false);
 
-    private final double ANGLE_TOLERANCE = 2.5;
+    private final double ANGLE_TOLERANCE = 5;
 
     public ShooterStrategyManager() {
     }
