@@ -248,7 +248,6 @@ public class RobotContainer {
                                             .getDistance(pose.getTranslation());
                                     var rightDiff = ShootingLocation.RIGHT.pose.getTranslation()
                                             .getDistance(pose.getTranslation());
-
                                     // When PathPlanner flips the point, it does so by mirroring it over the Y axis.
                                     // So left becomes right and right becomes left on the red side.
                                     // Flipping the conditional for red allows for "left" to still be on the left
@@ -270,6 +269,7 @@ public class RobotContainer {
                                         .withTargetDirection(getRotationToTargetBasedOnZone()))
                                 .withTimeout(0.5)
                                 .withName("Field centric facing angle")));
+        primary.povDown().whileTrue(commandFactory.cmdOuttake()).onFalse(commandFactory.cmdHomeostasis());
 
         primary.rightBumper().onTrue(commandFactory.cmdStartCollectFuelPercentOut().withName("Collect fuel"));
         primary.leftBumper().onTrue(commandFactory.cmdStopCollectFuelPercentOut().withName("Stop collect fuel"));

@@ -130,8 +130,25 @@ public class CommandFactory {
     public Command cmdStartCollectFuelPercentOut() {
         return Commands.sequence(
                 Commands.runOnce(() -> hopper.setMotorPercentOut(0.3), hopper),
-                Commands.waitUntil(() -> hopper.isMotorCurrentAbove(15)),
+                Commands.waitUntil(() -> hopper.isMotorCurrentAbove(25)).withTimeout(1.5),
                 hopper.cmdStopMotor(),
                 intake.cmdSetMotorVelocity(IntakeVelocity.COLLECT));
     }
+
+    public Command cmdOuttake() {
+        return Commands.sequence(
+                Commands.runOnce(() -> hopper.setMotorPercentOut(0.3), hopper),
+                Commands.waitUntil(() -> hopper.isMotorCurrentAbove(25)).withTimeout(1.5),
+                hopper.cmdStopMotor(),
+                intake.cmdSetMotorVelocity(IntakeVelocity.UNJAM),
+                Commands.waitSeconds(1),
+                indexer.cmdSetMotorVelocity(IndexerVelocity.UNJAM));
+    }
+
+    public Command cmdHomeostasis() {
+        return Commands.sequence(
+                indexer.cmdStopMotor(),
+                intake.cmdStopMotor());
+    }
+
 }
