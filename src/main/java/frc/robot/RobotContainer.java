@@ -197,7 +197,7 @@ public class RobotContainer {
                         HoodPosition.ALLIANCE_ZONE)
                         .withName("Shoot default"));
 
-        primary.rightTrigger().and(primary.leftTrigger()).and(robotIsAligned)
+        primary.rightTrigger().and(primary.leftTrigger())
                 .whileTrue(commandFactory.cmdFireFuel(
                         () -> getVelocityBasedOnTargetDistance(),
                         () -> getHoodPositionBasedOnZone().rotations)
@@ -311,7 +311,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("FireFuel",
                 commandFactory.cmdFireFuel(
                         ShooterVelocity.SHOOT,
-                        HoodPosition.ALLIANCE_ZONE).withTimeout(4)
+                        HoodPosition.ALLIANCE_ZONE).withTimeout(3.5)
                         .andThen(commandFactory.cmdStopFireFuel()));
 
         NamedCommands.registerCommand("FireFuelByDistance",
