@@ -49,7 +49,7 @@ public class Intake extends SubsystemBase {
         Slot0Configs velocityGains = new Slot0Configs()
                 .withKS(0.1)
                 .withKV(0.11)
-                .withKP(0.5)
+                .withKP(0.65)
                 .withKI(0)
                 .withKD(0);
 
