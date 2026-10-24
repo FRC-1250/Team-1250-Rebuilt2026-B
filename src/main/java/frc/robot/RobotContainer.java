@@ -297,6 +297,7 @@ public class RobotContainer {
         addPathAuto("RightTrenchSingleSweep", "RightTrenchSingleSweep");
         addPathAuto("RightTrenchDoubleSweep", "RightTrenchDoubleSweep");
         addPathAuto("CenterDepotOutpost", "CenterDepotOutpost");
+        addPathAuto("CenterBackupShoot", "CenterBackupShoot");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
