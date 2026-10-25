@@ -109,6 +109,7 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
+            CommandScheduler.getInstance().schedule(robotContainer.commandFactory.cmdStopFireFuel());
         }
 
     }
