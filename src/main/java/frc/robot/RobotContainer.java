@@ -181,6 +181,10 @@ public class RobotContainer {
         return targetManager.getTargetingState().distance();
     }
 
+    private double remapJoystickValue(double value) {
+        return (value / Math.abs(value)) * Math.pow(Math.abs(value), 1.5);
+    }
+
     private void configureButtonBindings() {
         swerve.setDefaultCommand(
                 swerve.applyRequest(() -> drive
